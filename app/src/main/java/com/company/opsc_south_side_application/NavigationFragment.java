@@ -30,6 +30,7 @@ public class NavigationFragment extends Fragment {
     ImageButton bicycleButton;
     ImageButton exitButton;
     ImageButton favouriteButton;
+    ImageButton settingsButton;
     String mode = "";
     Boolean  chosenMode = false;
 
@@ -75,6 +76,8 @@ public class NavigationFragment extends Fragment {
         motor = view.findViewById(R.id.imageButtonCarMode);
         bicycleButton = view.findViewById(R.id.imageButtonCycleMode);
         trainButton = view.findViewById(R.id.imageButtonTrainMode);
+        favouriteButton = view.findViewById(R.id.imageButtonFavourite);
+        settingsButton = view.findViewById(R.id.imageButtonSetting);
 
         //Boolean chosenMode = false;
         walkButton.setOnClickListener(new View.OnClickListener() {
