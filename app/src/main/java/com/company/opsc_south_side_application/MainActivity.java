@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
@@ -67,13 +68,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
-    GoogleMap mGoogleMap;
+    public static GoogleMap mGoogleMap;
     LocationRequest locationRequest;
+    public static Context context;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private final int requestCode = 2;
@@ -84,13 +88,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static LatLng dest;
     private List<Routes> routes;
     FloatingActionButton button;
+    Boolean choosenMode = false;
+    String modeName;
+    private Map<Marker, Map<String, Object>> markers = new HashMap<>();
+    private Map<String, Object> dataModel = new HashMap<>();
+    public static NavigationFragment dialogFragment;
 
     AutocompleteSupportFragment autocompleteFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        context = getApplicationContext();
+        dialogFragment = new NavigationFragment();
         Places.initialize(getApplicationContext(), GOOGLE_KEY);
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
@@ -138,11 +148,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onCreate(mapViewBundle);//
 
         mMapView.getMapAsync(this);
+
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+        // Add a marker in Sydney and move the camera
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            ActivityCompat.requestPermissions(this, reqPermissions, requestCode);
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
+        //googleMap.getUiSettings().isMyLocationButtonEnabled();
+        mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mGoogleMap.getUiSettings().setCompassEnabled(true);
+        getLastLocation();
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Map dataModel = (Map)markers.get(marker);
+                dest = new LatLng((double)dataModel.get("latitude"),(double)dataModel.get("longitude"));
+                //dialogFragment=new NavigationFragment();
+                dialogFragment.show(getSupportFragmentManager(),"My  Fragment");
+                // getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new NavigationFragment()).setReorderingAllowed(true).commit();
 
+                return false;
+            }
+        });
     }
 
     private List<LatLng> decode(String points) {
@@ -235,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             double lon = location.getLongitude();
                             Log.d("LocationM","lat : " + lat + " lon : " + lon);
                             origin = new LatLng(lat,lon);
+                            getPlacesUrl();
                         }
                     }
                 });
@@ -276,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lon = mLastLocation.getLongitude();
             Log.d("LocationM","lat : " + lat + " lon : " + lon);
             origin = new LatLng(lat,lon);
+            getPlacesUrl();
         }
     };
 
@@ -311,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest, String mode) {
+    public static String getDirectionsUrl(LatLng origin, LatLng dest, String mode) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -356,8 +399,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             urlConnection.disconnect();
         }
     }
+    public void impelemntFetchDirection(URL url){
+        new fetchDirectionsData().execute(url);
+    }
 
-    public class fetchDirectionsData extends AsyncTask<URL,Void,String> {
+    public  class fetchDirectionsData extends AsyncTask<URL,Void,String> {
 
         @Override
         protected String doInBackground(URL... urls) {
@@ -389,6 +435,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private String downloadPlacesUrl(String category){
+        String url;
+        switch (category){
+            case "Restaurant":
+                url = "https://api.geoapify.com/v2/places?categories=catering.restaurant&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Gas Station":
+                url = "https://api.geoapify.com/v2/places?categories=service.vehicle.fuel&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Museum":
+                url = "https://api.geoapify.com/v2/places?categories=entertainment.museum&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Park":
+                url = "https://api.geoapify.com/v2/places?categories=leisure.park&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Supermarket":
+                url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            default :
+                url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+        }
+
+        return url;
+    }
+
     private  void getPlacesUrl(){
         Gson gson = new Gson();
         URL url1;
@@ -396,7 +468,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         try {
             String url = "";
-            url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:28.1289133,-25.9949025&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+            url = downloadPlacesUrl("Gas Station");
+            //url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:28.1289133,-25.9949025&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
             url1 = new URL(url);
             new fetchPlacesData().execute(url1);
 
@@ -431,17 +504,84 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void consumeGsonPlaces(String propertiesData) {
         Gson gson = new Gson();
+        Marker marker;
         com.company.opsc_south_side_application.placesModel.Root placesData = gson.fromJson(propertiesData, com.company.opsc_south_side_application.placesModel.Root.class);
 
         for(Features feature : placesData.getFeatures()){
             double latitude = feature.getProperties().getLat();
             double longitude = feature.getProperties().getLon();
 
-            mGoogleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude))
-                    .title("SuperMarket : " + feature.getProperties().getName())
-                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
-            );
+            String mode = "Gas Station";
+            switch(mode){
+                case "Gas Station":
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Gas Station : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.baseline_local_gas_station_black_24dp))
+
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    markers.put(marker, dataModel);
+                    break;
+                case "Restaurant":
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Restaurant : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    markers.put(marker, dataModel);
+                    break;
+                case "Museum":
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Museum : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.baseline_museum_black_24dp))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    markers.put(marker, dataModel);
+                    break;
+                case "Park":
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Park : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.baseline_park_black_24dp))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    markers.put(marker, dataModel);
+                    break;
+                case "Supermarket":
+                    marker =mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("SuperMarket : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    markers.put(marker, dataModel);
+                    break;
+                default:
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("SuperMarket : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    markers.put(marker, dataModel);
+                    break;
+
+            }
         }
     }
 
@@ -479,6 +619,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Legs leg = route.getLegs().get(0);
 
             Log.d("LocationM","data end: " + leg.getEnd_location().getLat() + "Long : " + leg.getEnd_location().getLng() );
+            dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
             mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getEnd_location().getLat(), leg.getEnd_location().getLng()))
                     .title("End Location"));

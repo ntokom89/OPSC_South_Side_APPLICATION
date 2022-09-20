@@ -1,20 +1,31 @@
 package com.company.opsc_south_side_application;
 
+import static com.company.opsc_south_side_application.MainActivity.dest;
+import static com.company.opsc_south_side_application.MainActivity.getDirectionsUrl;
+import static com.company.opsc_south_side_application.MainActivity.origin;
+
+import android.app.Dialog;
 import android.os.Bundle;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link NavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NavigationFragment extends Fragment {
+public class NavigationFragment extends DialogFragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,6 +42,8 @@ public class NavigationFragment extends Fragment {
     ImageButton exitButton;
     ImageButton favouriteButton;
     ImageButton settingsButton;
+    Button buttonStartNav;
+    TextView distance, duration;
     String mode = "";
     Boolean  chosenMode = false;
 
@@ -78,6 +91,11 @@ public class NavigationFragment extends Fragment {
         trainButton = view.findViewById(R.id.imageButtonTrainMode);
         favouriteButton = view.findViewById(R.id.imageButtonFavourite);
         settingsButton = view.findViewById(R.id.imageButtonSetting);
+        buttonStartNav = view.findViewById(R.id.buttonStartNav);
+        duration = view.findViewById(R.id.textViewHours);
+        distance = view.findViewById(R.id.textViewDistance);
+        exitButton = view.findViewById(R.id.imageButtonClose);
+
 
         //Boolean chosenMode = false;
         walkButton.setOnClickListener(new View.OnClickListener() {
@@ -132,6 +150,46 @@ public class NavigationFragment extends Fragment {
                 }
             }
         });
+        buttonStartNav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                URL urlConnection;
+                String url;
+                try {
+                    url = getDirectionsUrl(origin, dest, mode);
+                    urlConnection = new URL(url);
+                    MainActivity main = new MainActivity();
+                    main.impelemntFetchDirection(urlConnection);
+                    //new MainActivity.fetchDirectionsData().execute(urlConnection);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog d = getDialog();
+                d.dismiss();
+            }
+        });
         return view;
+    }
+
+    public void setUpFragmentUi(String distanceS, String durationS){
+        duration.setText(durationS);
+        distance.setText(distanceS);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog d = getDialog();
+        if (d!=null){
+            int width = ViewGroup.LayoutParams.MATCH_PARENT;
+            int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            d.getWindow().setLayout(width, height);
+        }
     }
 }
