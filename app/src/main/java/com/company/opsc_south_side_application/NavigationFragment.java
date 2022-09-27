@@ -1,8 +1,10 @@
 package com.company.opsc_south_side_application;
 
 import static com.company.opsc_south_side_application.MainActivity.dest;
+import static com.company.opsc_south_side_application.MainActivity.fragmentType;
 import static com.company.opsc_south_side_application.MainActivity.getDirectionsUrl;
 import static com.company.opsc_south_side_application.MainActivity.origin;
+import static com.company.opsc_south_side_application.MainActivity.title;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +46,8 @@ public class NavigationFragment extends DialogFragment{
     ImageButton favouriteButton;
     ImageButton settingsButton;
     Button buttonStartNav;
-    TextView distance, duration;
+    TextView distance, duration, userLocation;
+    TextView destLocation;
     String mode = "";
     Boolean  chosenMode = false;
 
@@ -95,6 +99,8 @@ public class NavigationFragment extends DialogFragment{
         duration = view.findViewById(R.id.textViewHours);
         distance = view.findViewById(R.id.textViewDistance);
         exitButton = view.findViewById(R.id.imageButtonClose);
+        userLocation = view.findViewById(R.id.textViewMyLocation);
+        destLocation = view.findViewById(R.id.textViewDestLocation);
 
 
         //Boolean chosenMode = false;
@@ -157,6 +163,7 @@ public class NavigationFragment extends DialogFragment{
                 String url;
                 try {
                     url = getDirectionsUrl(origin, dest, mode);
+                    fragmentType = "Main Nav";
                     urlConnection = new URL(url);
                     MainActivity main = new MainActivity();
                     main.impelemntFetchDirection(urlConnection);
@@ -182,6 +189,11 @@ public class NavigationFragment extends DialogFragment{
         distance.setText(distanceS);
     }
 
+    public void setUpFragmentUiAddress(String destLocationS){
+        //Log.d("TitleUpload", destLocationS);
+        destLocation.setText(destLocationS);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -191,5 +203,6 @@ public class NavigationFragment extends DialogFragment{
             int height = ViewGroup.LayoutParams.WRAP_CONTENT;
             d.getWindow().setLayout(width, height);
         }
+        setUpFragmentUiAddress(title);
     }
 }

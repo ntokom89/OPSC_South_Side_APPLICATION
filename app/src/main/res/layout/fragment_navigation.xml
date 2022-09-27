@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="380dp"
     android:background="@drawable/circle_shape"
@@ -10,6 +11,39 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="340dp">
+
+        <LinearLayout
+            android:layout_width="207dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/circle_light"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textViewMyLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="My Location"
+                android:textColor="#000000" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_arrow_downward" />
+
+            <TextView
+                android:id="@+id/textViewDestLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Destination"
+                android:textColor="#000000" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -52,12 +86,12 @@
 
         <ImageButton
             android:id="@+id/imageButtonCarMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="49dp"
+            android:layout_height="41dp"
             android:layout_marginStart="18dp"
-            android:layout_marginTop="96dp"
+            android:layout_marginTop="104dp"
             android:layout_marginEnd="2dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/custom_selector"
             android:src="@drawable/ic_car_mode"
             app:layout_constraintEnd_toStartOf="@+id/imageButtonTrainMode"
             app:layout_constraintStart_toStartOf="parent"
@@ -65,10 +99,10 @@
 
         <ImageButton
             android:id="@+id/imageButtonTrainMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="49dp"
+            android:layout_height="41dp"
             android:layout_marginEnd="18dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/custom_selector"
             android:src="@drawable/ic_transit_mode"
             app:layout_constraintEnd_toStartOf="@+id/imageButtonTaxiMode"
             app:layout_constraintStart_toEndOf="@+id/imageButtonCarMode"
@@ -76,10 +110,10 @@
 
         <ImageButton
             android:id="@+id/imageButtonTaxiMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="49dp"
+            android:layout_height="41dp"
             android:layout_marginEnd="2dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/custom_selector"
             android:src="@drawable/ic_taxi_mode"
             app:layout_constraintEnd_toStartOf="@+id/imageButtonWalkMode"
             app:layout_constraintStart_toEndOf="@+id/imageButtonTrainMode"
@@ -87,10 +121,10 @@
 
         <ImageButton
             android:id="@+id/imageButtonWalkMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="49dp"
+            android:layout_height="41dp"
             android:layout_marginEnd="5dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/custom_selector"
             android:src="@drawable/ic_walk_mode"
             app:layout_constraintEnd_toStartOf="@+id/imageButtonCycleMode"
             app:layout_constraintStart_toEndOf="@+id/imageButtonTaxiMode"
@@ -98,9 +132,9 @@
 
         <ImageButton
             android:id="@+id/imageButtonCycleMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/white"
+            android:layout_width="49dp"
+            android:layout_height="41dp"
+            android:background="@drawable/custom_selector"
             android:src="@drawable/ic_bike_mode"
             app:layout_constraintBottom_toBottomOf="@+id/imageButtonTrainMode"
             app:layout_constraintEnd_toEndOf="parent"

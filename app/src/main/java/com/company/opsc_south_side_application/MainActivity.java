@@ -27,6 +27,7 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.company.opsc_south_side_application.directionsModel.Legs;
@@ -68,7 +69,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static GoogleMap mGoogleMap;
     LocationRequest locationRequest;
     public static Context context;
+    public static String fragmentType;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private final int requestCode = 2;
@@ -88,11 +92,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static LatLng dest;
     private List<Routes> routes;
     FloatingActionButton button;
+    Button buttonWhere;
     Boolean choosenMode = false;
     String modeName;
-    private Map<Marker, Map<String, Object>> markers = new HashMap<>();
-    private Map<String, Object> dataModel = new HashMap<>();
+    public static  Hashtable<Marker, Map<String, Object>> markers = new Hashtable<>();
+    public static  Map<String, Object> dataModel = new HashMap<>();
+    public static Hashtable<Marker,String> listener = new Hashtable<Marker,String>();
+    public static Hashtable<Marker,String> titleList = new Hashtable<Marker,String>();
     public static NavigationFragment dialogFragment;
+    public static WhereNavigationFragment whereNavFragment;
+    public static String title;
 
     AutocompleteSupportFragment autocompleteFragment;
     @Override
@@ -101,10 +110,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
         dialogFragment = new NavigationFragment();
+        whereNavFragment = new WhereNavigationFragment();
         Places.initialize(getApplicationContext(), GOOGLE_KEY);
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
         button = findViewById(R.id.floatingActionButton);
+        buttonWhere = findViewById(R.id.buttonWhereNavigation);
+        /*
         autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autoCompleteDestination);
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.ADDRESS));
@@ -122,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+         */
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,6 +148,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        buttonWhere.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                whereNavFragment.show(getSupportFragmentManager(), "My  Fragment");
             }
         });
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -175,12 +196,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Map dataModel = (Map)markers.get(marker);
-                dest = new LatLng((double)dataModel.get("latitude"),(double)dataModel.get("longitude"));
-                //dialogFragment=new NavigationFragment();
-                dialogFragment.show(getSupportFragmentManager(),"My  Fragment");
-                // getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new NavigationFragment()).setReorderingAllowed(true).commit();
+                Map dataModel = markers.get(marker);
+                String markerType = listener.get(marker);
+                if(markerType.equals("PlaceMarkerType")) {
+                    dest = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
+                    //dialogFragment=new NavigationFragment();
+                     title = titleList.get(marker);
+                    Log.d("placeTitle",title);
+                    dialogFragment.show(getSupportFragmentManager(), "My  Fragment");
+                    //dialogFragment.destLocationAddress = title;
+                    //dialogFragment.setUpFragmentUiAddress(titleList.get(marker));
 
+                    // getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new NavigationFragment()).setReorderingAllowed(true).commit();
+                }else if (markerType.equals("directionMarker")){
+
+                }
                 return false;
             }
         });
@@ -517,68 +547,76 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("Gas Station : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.baseline_local_gas_station_black_24dp))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_local_gas_station_black_24dp))
 
                     );
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
+                    titleList.put(marker,"Gas Station : " + feature.getProperties().getName());
                     break;
                 case "Restaurant":
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("Restaurant : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
                     );
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Museum":
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("Museum : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.baseline_museum_black_24dp))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_museum_black_24dp))
+
                     );
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Park":
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("Park : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.baseline_park_black_24dp))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_park_black_24dp))
                     );
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Supermarket":
                     marker =mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("SuperMarket : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
                     );
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
                     break;
                 default:
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("SuperMarket : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
                     );
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
                     break;
 
             }
@@ -619,15 +657,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Legs leg = route.getLegs().get(0);
 
             Log.d("LocationM","data end: " + leg.getEnd_location().getLat() + "Long : " + leg.getEnd_location().getLng() );
-            dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
-            mGoogleMap.addMarker(new MarkerOptions()
+            if(fragmentType.equals("Main Nav")){
+                dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
+            }else if(fragmentType.equals("Where Nav")){
+                Toast.makeText(context,"Duration : " + leg.getDuration().getText() +" Distance : " + leg.getDistance().getText(),Toast.LENGTH_LONG).show();
+            }
+            //dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
+            Marker endMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getEnd_location().getLat(), leg.getEnd_location().getLng()))
-                    .title("End Location"));
+                    .title("End Location" + "\n" + leg.getEnd_address()));
 
-            mGoogleMap.addMarker(new MarkerOptions()
+            listener.put(endMarker,"directionMarker");
+            Marker startMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getStart_location().getLat(), leg.getStart_location().getLng()))
                     .title("Start Location")
             );
+            listener.put(startMarker,"directionMarker");
 
             List<LatLng> stepList = new ArrayList<>();
 
@@ -709,7 +754,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void clearUI() {
 
         mGoogleMap.clear();
-
+        getPlacesUrl();
 
     }
 
