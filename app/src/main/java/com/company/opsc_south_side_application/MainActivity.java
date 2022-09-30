@@ -2,13 +2,6 @@ package com.company.opsc_south_side_application;
 
 import static android.content.ContentValues.TAG;
 
-import static com.company.opsc_south_side_application.BuildConfig.GOOGLE_KEY;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -28,6 +21,11 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.company.opsc_south_side_application.directionsModel.Legs;
 import com.company.opsc_south_side_application.directionsModel.Root;
@@ -89,9 +87,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.fragment_edit_profile);
 
-        Places.initialize(getApplicationContext(), GOOGLE_KEY);
+        //Places.initialize(getApplicationContext(), GOOGLE_KEY);
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
         button = findViewById(R.id.floatingActionButton);

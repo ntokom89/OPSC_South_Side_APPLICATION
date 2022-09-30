@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".profileFragment">
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="49dp"
+        android:layout_marginBottom="386dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilePicture"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="50dp"
+            android:src="@drawable/ic_baseline_person_24" />
+
+        <TextView
+            android:id="@+id/profileNameTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="170dp"
+            android:layout_marginTop="60dp"
+            android:text="Jane Doe"
+            android:textColor="@color/black"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/aboutTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="170dp"
+            android:layout_marginTop="100dp"
+            android:text="Experienced Traveller"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/phoneTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="160dp"
+            android:drawableLeft="@drawable/ic_baseline_phone_24"
+            android:onClick="replaceWithEdit"
+            android:text="  012-345-6789"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/emailTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="190dp"
+            android:drawableLeft="@drawable/ic_baseline_email_24"
+            android:onClick="replaceWithEdit"
+            android:text="  janedoe@fakeemail.com"
+            android:textSize="20dp" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="220dp"
+        android:layout_marginBottom="280dp">
+
+        <TextView
+            android:id="@+id/pointsTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="180dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="637"
+            android:textColor="#000000"
+            android:textSize="30dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/points2Txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="175dp"
+            android:layout_marginTop="60dp"
+            android:text="Points"
+            android:textSize="20dp" />
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/clickablesLayout"
+        android:layout_width="288dp"
+        android:layout_height="166dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="323dp"
+        android:layout_marginEnd="121dp"
+        android:layout_marginBottom="114dp">
+
+        <!--TODO: Create method going to favourites page-->
+        <TextView
+            android:id="@+id/favouritesTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="109dp"
+            android:layout_marginBottom="131dp"
+            android:drawableLeft="@drawable/ic_baseline_favorite_border_24"
+            android:onClick="replaceWithFavourites"
+            android:text="  My Favourites"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/shareTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="45dp"
+            android:layout_marginEnd="67dp"
+            android:layout_marginBottom="94dp"
+            android:drawableLeft="@drawable/ic_baseline_share_24"
+            android:text="  Share with a friend"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/settingsTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="161dp"
+            android:layout_marginBottom="59dp"
+            android:drawableLeft="@drawable/ic_baseline_settings_24"
+            android:onClick="replaceWithSettings"
+            android:text="  Settings"
+            android:textSize="20dp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
