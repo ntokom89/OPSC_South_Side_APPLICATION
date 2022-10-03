@@ -1,18 +1,31 @@
 package com.company.opsc_south_side_application;
 
-public class FavouritePlacesModel {
+public class PlacesModel {
+    private String placeID;
     private String name;
-    private String location;
+    private String placeType;
     private String Address;
     private Double latitude;
     private Double longitude;
 
-    public FavouritePlacesModel(String name, String location, String address, Double latitude, Double longitude) {
+    public PlacesModel(String placeID, String name, String placeType, String address, Double latitude, Double longitude) {
+        this.placeID = placeID;
         this.name = name;
-        this.location = location;
+        this.placeType = placeType;
         Address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public PlacesModel() {
+    }
+
+    public String getPlaceID() {
+        return placeID;
+    }
+
+    public void setPlaceID(String placeID) {
+        this.placeID = placeID;
     }
 
     public String getName() {
@@ -24,11 +37,11 @@ public class FavouritePlacesModel {
     }
 
     public String getLocation() {
-        return location;
+        return placeType;
     }
 
     public void setLocation(String location) {
-        this.location = location;
+        this.placeType = location;
     }
 
     public String getAddress() {

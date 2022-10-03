@@ -1,24 +1,31 @@
 package com.company.opsc_south_side_application;
 
+import static com.company.opsc_south_side_application.MainActivity.buttonWhere;
+//import static com.company.opsc_south_side_application.MainActivity.context;
+import static com.company.opsc_south_side_application.MainActivity.databaseReference;
 import static com.company.opsc_south_side_application.MainActivity.dest;
+//import static com.company.opsc_south_side_application.MainActivity.dialogFragment;
 import static com.company.opsc_south_side_application.MainActivity.fragmentType;
 import static com.company.opsc_south_side_application.MainActivity.getDirectionsUrl;
 import static com.company.opsc_south_side_application.MainActivity.origin;
 import static com.company.opsc_south_side_application.MainActivity.title;
 
-import android.app.Dialog;
 import android.os.Bundle;
 
-import androidx.fragment.app.DialogFragment;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,7 +35,7 @@ import java.net.URL;
  * Use the {@link NavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NavigationFragment extends DialogFragment{
+public class NavigationFragment extends Fragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -177,8 +184,10 @@ public class NavigationFragment extends DialogFragment{
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Dialog d = getDialog();
-                d.dismiss();
+                //Dialog d = getDialog();
+               // d.dismiss();
+                getParentFragmentManager().beginTransaction().remove(NavigationFragment.this).commit();
+                buttonWhere.setVisibility(View.VISIBLE);
             }
         });
         return view;
@@ -194,15 +203,36 @@ public class NavigationFragment extends DialogFragment{
         destLocation.setText(destLocationS);
     }
 
+    public void addPlaceToFirebase(PlacesModel placesModel){
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String placeID = databaseReference.push().getKey();
+                databaseReference.child("FavouritePlaces").child(placeID).setValue(placesModel);
+                Toast.makeText(requireContext().getApplicationContext(),"Place added to database",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+                Toast.makeText(requireContext().getApplicationContext(),"Failed to upload to database",Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     @Override
     public void onStart() {
         super.onStart();
+        /*
         Dialog d = getDialog();
         if (d!=null){
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
             int height = ViewGroup.LayoutParams.WRAP_CONTENT;
             d.getWindow().setLayout(width, height);
         }
+
+         */
         setUpFragmentUiAddress(title);
     }
 }

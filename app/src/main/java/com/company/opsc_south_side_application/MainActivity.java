@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentContainerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -22,6 +23,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationRequest;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
@@ -35,7 +37,6 @@ import com.company.opsc_south_side_application.directionsModel.Root;
 import com.company.opsc_south_side_application.directionsModel.Routes;
 import com.company.opsc_south_side_application.directionsModel.step.Steps;
 import com.company.opsc_south_side_application.placesModel.Features;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
@@ -55,11 +56,11 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -68,8 +69,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Dictionary;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -79,8 +79,7 @@ import java.util.Scanner;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
     public static GoogleMap mGoogleMap;
-    LocationRequest locationRequest;
-    public static Context context;
+    public  Context context;
     public static String fragmentType;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -92,15 +91,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static LatLng dest;
     private List<Routes> routes;
     FloatingActionButton button;
-    Button buttonWhere;
-    Boolean choosenMode = false;
-    String modeName;
+    String firebaseUser;
+    FirebaseAuth firebaseAuth;
+    public static DatabaseReference databaseReference;
+    public static Button buttonWhere;
     public static  Hashtable<Marker, Map<String, Object>> markers = new Hashtable<>();
     public static  Map<String, Object> dataModel = new HashMap<>();
     public static Hashtable<Marker,String> listener = new Hashtable<Marker,String>();
     public static Hashtable<Marker,String> titleList = new Hashtable<Marker,String>();
-    public static NavigationFragment dialogFragment;
-    public static WhereNavigationFragment whereNavFragment;
+    public static ArrayList<PlacesModel> placesModelsList = new ArrayList<>();
+    public  NavigationFragment dialogFragment;
+    public  WhereNavigationFragment whereNavFragment;
+    public static FragmentContainerView containerView;
     public static String title;
 
     AutocompleteSupportFragment autocompleteFragment;
@@ -112,29 +114,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         dialogFragment = new NavigationFragment();
         whereNavFragment = new WhereNavigationFragment();
         Places.initialize(getApplicationContext(), GOOGLE_KEY);
+        //firebaseUser = firebaseAuth.getUid();
+        //databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
         button = findViewById(R.id.floatingActionButton);
         buttonWhere = findViewById(R.id.buttonWhereNavigation);
-        /*
-        autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autoCompleteDestination);
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.ADDRESS));
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onError(@NonNull Status status) {
-
-            }
-
-            @Override
-            public void onPlaceSelected(@NonNull Place place) {
-
-                dest = place.getLatLng();
-
-            }
-        });
-
-         */
+        containerView = findViewById(R.id.fragmentContainerViewNav);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,6 +159,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    public void loadFirebaseData(){
+
+    }
+
+
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mGoogleMap = googleMap;
@@ -191,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //googleMap.getUiSettings().isMyLocationButtonEnabled();
         mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
         mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mGoogleMap.getUiSettings().setCompassEnabled(true);
+        //mGoogleMap.getUiSettings().setCompassEnabled(true);
         getLastLocation();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -203,7 +196,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //dialogFragment=new NavigationFragment();
                      title = titleList.get(marker);
                     Log.d("placeTitle",title);
-                    dialogFragment.show(getSupportFragmentManager(), "My  Fragment");
+                    //containerView.setVisibility(View.VISIBLE);
+                    buttonWhere.setVisibility(View.INVISIBLE);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewNav, dialogFragment).setReorderingAllowed(true).commit();
+                    //dialogFragment.show(getSupportFragmentManager(), "My  Fragment");
                     //dialogFragment.destLocationAddress = title;
                     //dialogFragment.setUpFragmentUiAddress(titleList.get(marker));
 
@@ -328,7 +324,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Initializing LocationRequest
         // object with appropriate methods
         com.google.android.gms.location.LocationRequest mLocationRequest = new com.google.android.gms.location.LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.QUALITY_HIGH_ACCURACY);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mLocationRequest.setPriority(LocationRequest.QUALITY_HIGH_ACCURACY);
+        }
         mLocationRequest.setInterval(5);
         mLocationRequest.setFastestInterval(0);
         mLocationRequest.setNumUpdates(1);
@@ -338,6 +336,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
     }
+
 
     private LocationCallback mLocationCallback = new LocationCallback() {
 
@@ -542,6 +541,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double longitude = feature.getProperties().getLon();
 
             String mode = "Gas Station";
+            PlacesModel place = new PlacesModel();
             switch(mode){
                 case "Gas Station":
                     marker = mGoogleMap.addMarker(new MarkerOptions()
@@ -555,6 +555,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
                     listener.put(marker,"PlaceMarkerType");
+                    place.setName("Gas Station : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    placesModelsList.add(place);
                     titleList.put(marker,"Gas Station : " + feature.getProperties().getName());
                     break;
                 case "Restaurant":
@@ -567,6 +570,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+
+                    place.setName("Restaurant : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Museum":
@@ -580,6 +587,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    place.setName("Museum : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Park":
@@ -592,6 +602,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    place.setName("Park : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Supermarket":
@@ -603,6 +616,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
+                    place.setName("SuperMarket : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    placesModelsList.add(place);
                     markers.put(marker, dataModel);
                     listener.put(marker,"PlaceMarkerType");
                     break;
@@ -616,6 +632,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
                     markers.put(marker, dataModel);
+                    place.setName("SuperMarket : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
 
@@ -665,12 +684,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
             Marker endMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getEnd_location().getLat(), leg.getEnd_location().getLng()))
-                    .title("End Location" + "\n" + leg.getEnd_address()));
+                    .title("End Location" + " " + leg.getEnd_address()));
 
             listener.put(endMarker,"directionMarker");
             Marker startMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getStart_location().getLat(), leg.getStart_location().getLng()))
-                    .title("Start Location")
+                    .title("Start Location " + leg.getStart_address())
             );
             listener.put(startMarker,"directionMarker");
 
@@ -685,7 +704,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             List<PatternItem> pattern;
 
-            pattern = Arrays.asList(
+            pattern = Collections.singletonList(
                     new Dash(30));
 
 

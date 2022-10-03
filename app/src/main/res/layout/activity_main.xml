@@ -23,11 +23,10 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerViewNav"
-        android:name="com.company.opsc_south_side_application.NavigationFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="499dp"
-        android:visibility="invisible" />
+        android:layout_height="350dp"
+        android:layout_marginTop="300dp"
+        android:visibility="visible" />
 
     <Button
         android:id="@+id/buttonWhereNavigation"

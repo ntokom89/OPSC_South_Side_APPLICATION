@@ -6,6 +6,7 @@ import static com.company.opsc_south_side_application.MainActivity.dest;
 import static com.company.opsc_south_side_application.MainActivity.fragmentType;
 import static com.company.opsc_south_side_application.MainActivity.getDirectionsUrl;
 import static com.company.opsc_south_side_application.MainActivity.origin;
+import static com.company.opsc_south_side_application.MainActivity.placesModelsList;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,6 +54,8 @@ public class WhereNavigationFragment extends DialogFragment {
     private LatLng destWhere;
     private Button buttonStartNav;
     private ImageButton backButton;
+    private RecyclerView recyclerViewPlaces;
+    private RecyclerView RecyclerViewFavouritesPlaces;
 
     public WhereNavigationFragment() {
         // Required empty public constructor
@@ -97,6 +101,7 @@ public class WhereNavigationFragment extends DialogFragment {
 
         buttonStartNav = view.findViewById(R.id.buttonNavStart);
         backButton = view.findViewById(R.id.imageButtonBackMap);
+        recyclerViewPlaces = view.findViewById(R.id.recyclerViewNearbyPlaces);
 
         autocompleteFragmentStart.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.ADDRESS));
 
@@ -157,6 +162,9 @@ public class WhereNavigationFragment extends DialogFragment {
             }
         });
 
+        whereplaceAdapter adapter = new whereplaceAdapter(placesModelsList);
+
+        recyclerViewPlaces.setAdapter(adapter);
         return view;
     }
 
