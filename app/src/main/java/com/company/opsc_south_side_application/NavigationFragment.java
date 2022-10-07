@@ -7,7 +7,9 @@ import static com.company.opsc_south_side_application.MainActivity.dest;
 //import static com.company.opsc_south_side_application.MainActivity.dialogFragment;
 import static com.company.opsc_south_side_application.MainActivity.fragmentType;
 import static com.company.opsc_south_side_application.MainActivity.getDirectionsUrl;
+import static com.company.opsc_south_side_application.MainActivity.metric;
 import static com.company.opsc_south_side_application.MainActivity.origin;
+import static com.company.opsc_south_side_application.MainActivity.place;
 import static com.company.opsc_south_side_application.MainActivity.title;
 
 import android.os.Bundle;
@@ -45,6 +47,7 @@ public class NavigationFragment extends Fragment{
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    public static Boolean isFavouritePlace;
     ImageButton motor;
     ImageButton walkButton;
     ImageButton trainButton;
@@ -109,6 +112,9 @@ public class NavigationFragment extends Fragment{
         userLocation = view.findViewById(R.id.textViewMyLocation);
         destLocation = view.findViewById(R.id.textViewDestLocation);
 
+        if(isFavouritePlace){
+            setUpFragmentUiFavourite();
+        }
 
         //Boolean chosenMode = false;
         walkButton.setOnClickListener(new View.OnClickListener() {
@@ -169,7 +175,7 @@ public class NavigationFragment extends Fragment{
                 URL urlConnection;
                 String url;
                 try {
-                    url = getDirectionsUrl(origin, dest, mode);
+                    url = getDirectionsUrl(origin, dest, mode,metric);
                     fragmentType = "Main Nav";
                     urlConnection = new URL(url);
                     MainActivity main = new MainActivity();
@@ -190,6 +196,13 @@ public class NavigationFragment extends Fragment{
                 buttonWhere.setVisibility(View.VISIBLE);
             }
         });
+
+        favouriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addPlaceToFirebase(place);
+            }
+        });
         return view;
     }
 
@@ -203,14 +216,19 @@ public class NavigationFragment extends Fragment{
         destLocation.setText(destLocationS);
     }
 
+    public void setUpFragmentUiFavourite(){
+        //Log.d("TitleUpload", destLocationS);
+        favouriteButton.setImageResource(R.drawable.ic_baseline_favorite_full);
+    }
     public void addPlaceToFirebase(PlacesModel placesModel){
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String placeID = databaseReference.push().getKey();
                 databaseReference.child("FavouritePlaces").child(placeID).setValue(placesModel);
                 Toast.makeText(requireContext().getApplicationContext(),"Place added to database",Toast.LENGTH_LONG).show();
+                favouriteButton.setImageResource(R.drawable.ic_baseline_favorite_full);
             }
 
             @Override
@@ -233,6 +251,6 @@ public class NavigationFragment extends Fragment{
         }
 
          */
-        setUpFragmentUiAddress(title);
+        setUpFragmentUiAddress(place.getName());
     }
 }

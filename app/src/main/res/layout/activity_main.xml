@@ -14,7 +14,7 @@
         android:layout_height="match_parent"></com.google.android.gms.maps.MapView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/floatingActionButtonProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -26,6 +26,12 @@
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_marginTop="300dp"
+        android:visibility="visible" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerViewWhere"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:visibility="visible" />
 
     <Button

@@ -3,6 +3,7 @@ package com.company.opsc_south_side_application;
 import static android.content.ContentValues.TAG;
 
 import static com.company.opsc_south_side_application.BuildConfig.GOOGLE_KEY;
+import static com.company.opsc_south_side_application.NavigationFragment.isFavouritePlace;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -59,8 +60,14 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -79,9 +86,11 @@ import java.util.Scanner;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
     public static GoogleMap mGoogleMap;
-    public  Context context;
+    public static Context context;
     public static String fragmentType;
+    public static FloatingActionButton profileButton;
     FusedLocationProviderClient fusedLocationProviderClient;
+    public static PlacesModel place;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private final int requestCode = 2;
     private final String[] reqPermissions = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
@@ -89,6 +98,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
    // private List<Routes> routes;
     public static LatLng origin;
     public static LatLng dest;
+    public static String metric;
+    User user;
+    public static String landmarkPreference;
     private List<Routes> routes;
     FloatingActionButton button;
     String firebaseUser;
@@ -100,7 +112,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static Hashtable<Marker,String> listener = new Hashtable<Marker,String>();
     public static Hashtable<Marker,String> titleList = new Hashtable<Marker,String>();
     public static ArrayList<PlacesModel> placesModelsList = new ArrayList<>();
-    public  NavigationFragment dialogFragment;
+    public static ArrayList<PlacesModel> favouritePlacesModelsList = new ArrayList<>();
+    public static NavigationFragment dialogFragment = new NavigationFragment();
     public  WhereNavigationFragment whereNavFragment;
     public static FragmentContainerView containerView;
     public static String title;
@@ -111,37 +124,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
-        dialogFragment = new NavigationFragment();
+        //dialogFragment = new NavigationFragment();
         whereNavFragment = new WhereNavigationFragment();
+
         Places.initialize(getApplicationContext(), GOOGLE_KEY);
-        //firebaseUser = firebaseAuth.getUid();
-        //databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+        //Firebase implementation later
+        firebaseAuth = FirebaseAuth.getInstance();
+        //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+        //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+
+        firebaseUser = firebaseAuth.getUid();
+         firebaseUser = "Vcz171LR1EfrkfpNBkxz6wzp6fF3";
+        databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+
+
+
+
 
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
-        button = findViewById(R.id.floatingActionButton);
+        //button = findViewById(R.id.floatingActionButtonProfile);
         buttonWhere = findViewById(R.id.buttonWhereNavigation);
         containerView = findViewById(R.id.fragmentContainerViewNav);
+        profileButton = findViewById(R.id.floatingActionButtonProfile);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                URL urlConnection;
-                String url;
-                try {
-                    url = getDirectionsUrl(origin, dest, null);
-                    urlConnection = new URL(url);
-                    new fetchDirectionsData().execute(urlConnection);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+
 
         buttonWhere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                whereNavFragment.show(getSupportFragmentManager(), "My  Fragment");
+                //whereNavFragment.show(getSupportFragmentManager(), "My  Fragment");
+                buttonWhere.setVisibility(View.INVISIBLE);
+                profileButton.setVisibility(View.INVISIBLE);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewWhere, whereNavFragment).setReorderingAllowed(true).commit();
             }
         });
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -158,8 +173,65 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.getMapAsync(this);
 
     }
+    private void signInWithAccountTest(String email, String password) {
+
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    FirebaseUser userFirebase = firebaseAuth.getCurrentUser();
+                    firebaseUser = firebaseAuth.getUid();
+                    Log.d("userID",firebaseUser);
+                    // = "0q89wT3EOGf0k1ostjHeqJ3eZIH3";
+                    databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+                    loadFirebaseData();
+                    Toast.makeText(MainActivity.this,"Login successful",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this,"Check your email or password",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
 
     public void loadFirebaseData(){
+        DatabaseReference placesListFirebase = databaseReference.child("FavouritePlaces");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                user = snapshot.getValue(User.class);
+                metric = user.getDistanceUnit();
+                landmarkPreference = user.getLandmarkPreference();
+                getPlacesUrl();
+                Log.d("Firebase data details", "metric : " + metric +", landmarkpreference : " + landmarkPreference);
+                //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+
+                //Declare the adapter and set it to the recyclerView
+                //progress_circular.setVisibility(View.GONE);
+
+                placesListFirebase.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        favouritePlacesModelsList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            PlacesModel placesModel = dataSnapshot.getValue(PlacesModel.class);
+                            favouritePlacesModelsList.add(placesModel);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(MainActivity.this,"Database reading failed for favourite places",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this,"Database reading failed for user settings",Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 
@@ -184,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //googleMap.getUiSettings().isMyLocationButtonEnabled();
         mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
         mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mGoogleMap.getUiSettings().setMapToolbarEnabled(false);
         //mGoogleMap.getUiSettings().setCompassEnabled(true);
         getLastLocation();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -192,15 +265,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Map dataModel = markers.get(marker);
                 String markerType = listener.get(marker);
                 if(markerType.equals("PlaceMarkerType")) {
+                    isFavouritePlace = false;
+                    title = titleList.get(marker);
+                    place = new PlacesModel();
+                    place.setLatitude(marker.getPosition().latitude);
+                    place.setLongitude(marker.getPosition().longitude);
+                    place.setPlaceType((String) dataModel.get("placeType"));
+                    place.setName(title);
+                    place.setAddress((String) dataModel.get("address"));
                     dest = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
-                    //dialogFragment=new NavigationFragment();
-                     title = titleList.get(marker);
-                    Log.d("placeTitle",title);
+                    dialogFragment=new NavigationFragment();
+
+                    //Log.d("placeTitle",title);
+
                     //containerView.setVisibility(View.VISIBLE);
                     buttonWhere.setVisibility(View.INVISIBLE);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewNav, dialogFragment).setReorderingAllowed(true).commit();
+                    for(PlacesModel place : favouritePlacesModelsList){
+                        if(place.getLatitude().equals(marker.getPosition().latitude) && place.getLongitude().equals(marker.getPosition().longitude)){
+                            isFavouritePlace = true;
+                        }
+                    }
                     //dialogFragment.show(getSupportFragmentManager(), "My  Fragment");
-                    //dialogFragment.destLocationAddress = title;
+                    //dialogFragment.destLocation.setText(title);
                     //dialogFragment.setUpFragmentUiAddress(titleList.get(marker));
 
                     // getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new NavigationFragment()).setReorderingAllowed(true).commit();
@@ -302,7 +389,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             double lon = location.getLongitude();
                             Log.d("LocationM","lat : " + lat + " lon : " + lon);
                             origin = new LatLng(lat,lon);
-                            getPlacesUrl();
+                            loadFirebaseData();
+                            //loadFirebaseData();
+                            //getPlacesUrl();
+                            //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+
                         }
                     }
                 });
@@ -347,7 +438,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lon = mLastLocation.getLongitude();
             Log.d("LocationM","lat : " + lat + " lon : " + lon);
             origin = new LatLng(lat,lon);
-            getPlacesUrl();
+            loadFirebaseData();
+            //loadFirebaseData();
+            //getPlacesUrl();
+            //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
         }
     };
 
@@ -383,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    public static String getDirectionsUrl(LatLng origin, LatLng dest, String mode) {
+    public static String getDirectionsUrl(LatLng origin, LatLng dest, String mode, String distanceUnit) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -393,13 +487,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Sensor enabled
         String sensor = "sensor=false";
+        String unitType = "units=" + distanceUnit;
         if(mode == null){
             mode = "mode=driving";
         }
         //String mode = "mode=driving";
 
         // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode +"&" +unitType ;
 
         // Output format
         String output = "json";
@@ -483,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
                 break;
             default :
-                url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket,entertainment.museum,leisure.park,service.vehicle.fuel,catering.restaurant&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=50&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
                 break;
         }
 
@@ -497,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         try {
             String url = "";
-            url = downloadPlacesUrl("Gas Station");
+            url = downloadPlacesUrl(landmarkPreference);
             //url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:28.1289133,-25.9949025&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
             url1 = new URL(url);
             new fetchPlacesData().execute(url1);
@@ -535,15 +630,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Gson gson = new Gson();
         Marker marker;
         com.company.opsc_south_side_application.placesModel.Root placesData = gson.fromJson(propertiesData, com.company.opsc_south_side_application.placesModel.Root.class);
-
+        placesModelsList.clear();
         for(Features feature : placesData.getFeatures()){
             double latitude = feature.getProperties().getLat();
             double longitude = feature.getProperties().getLon();
 
-            String mode = "Gas Station";
+            String mode = " ";
+            List<String> modes = feature.getProperties().getCategories();
+
+            if(modes.contains("service.vehicle.fuel")){
+                mode = "Gas Station";
+            }else if(modes.contains("commercial.supermarket")){
+                mode = "Supermarket";
+            }else if(modes.contains("entertainment.museum")){
+                mode = "Museum";
+            }else if(modes.contains("leisure.park")){
+                mode = "Park";
+            }else if(modes.contains("catering.restaurant")){
+                mode = "Restaurant";
+            }
             PlacesModel place = new PlacesModel();
             switch(mode){
                 case "Gas Station":
+                    Log.d("Place Name","Gas Station : " + feature.getProperties().getName());
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("Gas Station : " + feature.getProperties().getName())
@@ -553,10 +662,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
                     markers.put(marker, dataModel);
                     listener.put(marker,"PlaceMarkerType");
                     place.setName("Gas Station : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
                     placesModelsList.add(place);
                     titleList.put(marker,"Gas Station : " + feature.getProperties().getName());
                     break;
@@ -569,10 +681,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
                     markers.put(marker, dataModel);
 
                     place.setName("Restaurant : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
@@ -586,9 +701,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
                     markers.put(marker, dataModel);
                     place.setName("Museum : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
@@ -601,9 +719,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
                     markers.put(marker, dataModel);
                     place.setName("Park : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
@@ -616,12 +737,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
                     dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
                     place.setName("SuperMarket : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
                     placesModelsList.add(place);
                     markers.put(marker, dataModel);
                     listener.put(marker,"PlaceMarkerType");
                     break;
+                /*
                 default:
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
@@ -637,6 +762,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
+
+                 */
 
             }
         }
