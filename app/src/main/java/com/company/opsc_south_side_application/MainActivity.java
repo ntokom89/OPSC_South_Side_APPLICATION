@@ -2,6 +2,18 @@ package com.company.opsc_south_side_application;
 
 import static android.content.ContentValues.TAG;
 
+<<<<<<< HEAD
+=======
+import static com.company.opsc_south_side_application.BuildConfig.GOOGLE_KEY;
+import static com.company.opsc_south_side_application.NavigationFragment.isFavouritePlace;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentContainerView;
+
+>>>>>>> cba977fb52aadb3d5aa6be3a444620950e9c067d
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,11 +27,13 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationRequest;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,7 +46,6 @@ import com.company.opsc_south_side_application.directionsModel.Root;
 import com.company.opsc_south_side_application.directionsModel.Routes;
 import com.company.opsc_south_side_application.directionsModel.step.Steps;
 import com.company.opsc_south_side_application.placesModel.Features;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
@@ -44,6 +57,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
@@ -51,11 +65,17 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -64,15 +84,21 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mMapView;
-    GoogleMap mGoogleMap;
-    LocationRequest locationRequest;
+    public static GoogleMap mGoogleMap;
+    public static Context context;
+    public static String fragmentType;
+    public static FloatingActionButton profileButton;
     FusedLocationProviderClient fusedLocationProviderClient;
+    public static PlacesModel place;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private final int requestCode = 2;
     private final String[] reqPermissions = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
@@ -80,49 +106,72 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
    // private List<Routes> routes;
     public static LatLng origin;
     public static LatLng dest;
+    public static String metric;
+    User user;
+    public static String landmarkPreference;
     private List<Routes> routes;
     FloatingActionButton button;
+    String firebaseUser;
+    FirebaseAuth firebaseAuth;
+    public static DatabaseReference databaseReference;
+    public static Button buttonWhere;
+    public static  Hashtable<Marker, Map<String, Object>> markers = new Hashtable<>();
+    public static  Map<String, Object> dataModel = new HashMap<>();
+    public static Hashtable<Marker,String> listener = new Hashtable<Marker,String>();
+    public static Hashtable<Marker,String> titleList = new Hashtable<Marker,String>();
+    public static ArrayList<PlacesModel> placesModelsList = new ArrayList<>();
+    public static ArrayList<PlacesModel> favouritePlacesModelsList = new ArrayList<>();
+    public static NavigationFragment dialogFragment = new NavigationFragment();
+    public  WhereNavigationFragment whereNavFragment;
+    public static FragmentContainerView containerView;
+    public static String title;
 
     AutocompleteSupportFragment autocompleteFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+<<<<<<< HEAD
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.fragment_edit_profile);
 
         //Places.initialize(getApplicationContext(), GOOGLE_KEY);
+=======
+        setContentView(R.layout.activity_main);
+        context = getApplicationContext();
+        //dialogFragment = new NavigationFragment();
+        whereNavFragment = new WhereNavigationFragment();
+
+        Places.initialize(getApplicationContext(), GOOGLE_KEY);
+        //Firebase implementation later
+        firebaseAuth = FirebaseAuth.getInstance();
+        //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+        //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+
+        firebaseUser = firebaseAuth.getUid();
+         firebaseUser = "Vcz171LR1EfrkfpNBkxz6wzp6fF3";
+        databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+
+
+
+
+
+>>>>>>> cba977fb52aadb3d5aa6be3a444620950e9c067d
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
-        button = findViewById(R.id.floatingActionButton);
-        autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autoCompleteDestination);
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.ADDRESS));
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onError(@NonNull Status status) {
+        //button = findViewById(R.id.floatingActionButtonProfile);
+        buttonWhere = findViewById(R.id.buttonWhereNavigation);
+        containerView = findViewById(R.id.fragmentContainerViewNav);
+        profileButton = findViewById(R.id.floatingActionButtonProfile);
 
-            }
 
-            @Override
-            public void onPlaceSelected(@NonNull Place place) {
 
-                dest = place.getLatLng();
-
-            }
-        });
-
-        button.setOnClickListener(new View.OnClickListener() {
+        buttonWhere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                URL urlConnection;
-                String url;
-                try {
-                    url = getDirectionsUrl(origin, dest, null);
-                    urlConnection = new URL(url);
-                    new fetchDirectionsData().execute(urlConnection);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                //whereNavFragment.show(getSupportFragmentManager(), "My  Fragment");
+                buttonWhere.setVisibility(View.INVISIBLE);
+                profileButton.setVisibility(View.INVISIBLE);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewWhere, whereNavFragment).setReorderingAllowed(true).commit();
             }
         });
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -137,11 +186,132 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onCreate(mapViewBundle);//
 
         mMapView.getMapAsync(this);
+
     }
+    private void signInWithAccountTest(String email, String password) {
+
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    FirebaseUser userFirebase = firebaseAuth.getCurrentUser();
+                    firebaseUser = firebaseAuth.getUid();
+                    Log.d("userID",firebaseUser);
+                    // = "0q89wT3EOGf0k1ostjHeqJ3eZIH3";
+                    databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+                    loadFirebaseData();
+                    Toast.makeText(MainActivity.this,"Login successful",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this,"Check your email or password",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    public void loadFirebaseData(){
+        DatabaseReference placesListFirebase = databaseReference.child("FavouritePlaces");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                user = snapshot.getValue(User.class);
+                metric = user.getDistanceUnit();
+                landmarkPreference = user.getLandmarkPreference();
+                getPlacesUrl();
+                Log.d("Firebase data details", "metric : " + metric +", landmarkpreference : " + landmarkPreference);
+                //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+
+                //Declare the adapter and set it to the recyclerView
+                //progress_circular.setVisibility(View.GONE);
+
+                placesListFirebase.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        favouritePlacesModelsList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            PlacesModel placesModel = dataSnapshot.getValue(PlacesModel.class);
+                            favouritePlacesModelsList.add(placesModel);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(MainActivity.this,"Database reading failed for favourite places",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this,"Database reading failed for user settings",Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+        // Add a marker in Sydney and move the camera
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            ActivityCompat.requestPermissions(this, reqPermissions, requestCode);
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
+        //googleMap.getUiSettings().isMyLocationButtonEnabled();
+        mGoogleMap.getUiSettings().setTiltGesturesEnabled(true);
+        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mGoogleMap.getUiSettings().setMapToolbarEnabled(false);
+        //mGoogleMap.getUiSettings().setCompassEnabled(true);
+        getLastLocation();
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Map dataModel = markers.get(marker);
+                String markerType = listener.get(marker);
+                if(markerType.equals("PlaceMarkerType")) {
+                    isFavouritePlace = false;
+                    title = titleList.get(marker);
+                    place = new PlacesModel();
+                    place.setLatitude(marker.getPosition().latitude);
+                    place.setLongitude(marker.getPosition().longitude);
+                    place.setPlaceType((String) dataModel.get("placeType"));
+                    place.setName(title);
+                    place.setAddress((String) dataModel.get("address"));
+                    dest = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
+                    dialogFragment=new NavigationFragment();
 
+                    //Log.d("placeTitle",title);
+
+                    //containerView.setVisibility(View.VISIBLE);
+                    buttonWhere.setVisibility(View.INVISIBLE);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewNav, dialogFragment).setReorderingAllowed(true).commit();
+                    for(PlacesModel place : favouritePlacesModelsList){
+                        if(place.getLatitude().equals(marker.getPosition().latitude) && place.getLongitude().equals(marker.getPosition().longitude)){
+                            isFavouritePlace = true;
+                        }
+                    }
+                    //dialogFragment.show(getSupportFragmentManager(), "My  Fragment");
+                    //dialogFragment.destLocation.setText(title);
+                    //dialogFragment.setUpFragmentUiAddress(titleList.get(marker));
+
+                    // getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new NavigationFragment()).setReorderingAllowed(true).commit();
+                }else if (markerType.equals("directionMarker")){
+
+                }
+                return false;
+            }
+        });
     }
 
     private List<LatLng> decode(String points) {
@@ -234,6 +404,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             double lon = location.getLongitude();
                             Log.d("LocationM","lat : " + lat + " lon : " + lon);
                             origin = new LatLng(lat,lon);
+                            loadFirebaseData();
+                            //loadFirebaseData();
+                            //getPlacesUrl();
+                            //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
+
                         }
                     }
                 });
@@ -255,7 +430,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Initializing LocationRequest
         // object with appropriate methods
         com.google.android.gms.location.LocationRequest mLocationRequest = new com.google.android.gms.location.LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.QUALITY_HIGH_ACCURACY);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mLocationRequest.setPriority(LocationRequest.QUALITY_HIGH_ACCURACY);
+        }
         mLocationRequest.setInterval(5);
         mLocationRequest.setFastestInterval(0);
         mLocationRequest.setNumUpdates(1);
@@ -266,6 +443,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
     }
 
+
     private LocationCallback mLocationCallback = new LocationCallback() {
 
         @Override
@@ -275,6 +453,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lon = mLastLocation.getLongitude();
             Log.d("LocationM","lat : " + lat + " lon : " + lon);
             origin = new LatLng(lat,lon);
+            loadFirebaseData();
+            //loadFirebaseData();
+            //getPlacesUrl();
+            //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
         }
     };
 
@@ -310,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest, String mode) {
+    public static String getDirectionsUrl(LatLng origin, LatLng dest, String mode, String distanceUnit) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -320,13 +502,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Sensor enabled
         String sensor = "sensor=false";
+        String unitType = "units=" + distanceUnit;
         if(mode == null){
             mode = "mode=driving";
         }
         //String mode = "mode=driving";
 
         // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode +"&" +unitType ;
 
         // Output format
         String output = "json";
@@ -355,8 +538,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             urlConnection.disconnect();
         }
     }
+    public void impelemntFetchDirection(URL url){
+        new fetchDirectionsData().execute(url);
+    }
 
-    public class fetchDirectionsData extends AsyncTask<URL,Void,String> {
+    public  class fetchDirectionsData extends AsyncTask<URL,Void,String> {
 
         @Override
         protected String doInBackground(URL... urls) {
@@ -388,6 +574,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private String downloadPlacesUrl(String category){
+        String url;
+        switch (category){
+            case "Restaurant":
+                url = "https://api.geoapify.com/v2/places?categories=catering.restaurant&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Gas Station":
+                url = "https://api.geoapify.com/v2/places?categories=service.vehicle.fuel&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Museum":
+                url = "https://api.geoapify.com/v2/places?categories=entertainment.museum&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Park":
+                url = "https://api.geoapify.com/v2/places?categories=leisure.park&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            case "Supermarket":
+                url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+            default :
+                url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket,entertainment.museum,leisure.park,service.vehicle.fuel,catering.restaurant&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=50&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+                break;
+        }
+
+        return url;
+    }
+
     private  void getPlacesUrl(){
         Gson gson = new Gson();
         URL url1;
@@ -395,7 +607,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         try {
             String url = "";
-            url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:28.1289133,-25.9949025&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+            url = downloadPlacesUrl(landmarkPreference);
+            //url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:28.1289133,-25.9949025&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
             url1 = new URL(url);
             new fetchPlacesData().execute(url1);
 
@@ -430,17 +643,144 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void consumeGsonPlaces(String propertiesData) {
         Gson gson = new Gson();
+        Marker marker;
         com.company.opsc_south_side_application.placesModel.Root placesData = gson.fromJson(propertiesData, com.company.opsc_south_side_application.placesModel.Root.class);
-
+        placesModelsList.clear();
         for(Features feature : placesData.getFeatures()){
             double latitude = feature.getProperties().getLat();
             double longitude = feature.getProperties().getLon();
 
-            mGoogleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude))
-                    .title("SuperMarket : " + feature.getProperties().getName())
-                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.supermarket_icon_32px))
-            );
+            String mode = " ";
+            List<String> modes = feature.getProperties().getCategories();
+
+            if(modes.contains("service.vehicle.fuel")){
+                mode = "Gas Station";
+            }else if(modes.contains("commercial.supermarket")){
+                mode = "Supermarket";
+            }else if(modes.contains("entertainment.museum")){
+                mode = "Museum";
+            }else if(modes.contains("leisure.park")){
+                mode = "Park";
+            }else if(modes.contains("catering.restaurant")){
+                mode = "Restaurant";
+            }
+            PlacesModel place = new PlacesModel();
+            switch(mode){
+                case "Gas Station":
+                    Log.d("Place Name","Gas Station : " + feature.getProperties().getName());
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Gas Station : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_local_gas_station_black_24dp))
+
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
+                    markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
+                    place.setName("Gas Station : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
+                    placesModelsList.add(place);
+                    titleList.put(marker,"Gas Station : " + feature.getProperties().getName());
+                    break;
+                case "Restaurant":
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Restaurant : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
+                    markers.put(marker, dataModel);
+
+                    place.setName("Restaurant : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
+                    placesModelsList.add(place);
+                    listener.put(marker,"PlaceMarkerType");
+                    break;
+                case "Museum":
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Museum : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_museum_black_24dp))
+
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
+                    markers.put(marker, dataModel);
+                    place.setName("Museum : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
+                    placesModelsList.add(place);
+                    listener.put(marker,"PlaceMarkerType");
+                    break;
+                case "Park":
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("Park : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_park_black_24dp))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
+                    markers.put(marker, dataModel);
+                    place.setName("Park : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
+                    placesModelsList.add(place);
+                    listener.put(marker,"PlaceMarkerType");
+                    break;
+                case "Supermarket":
+                    marker =mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("SuperMarket : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    dataModel.put("address", feature.getProperties().getAddress_line2());
+                    dataModel.put("placeType",mode);
+                    place.setName("SuperMarket : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setPlaceType(mode);
+                    placesModelsList.add(place);
+                    markers.put(marker, dataModel);
+                    listener.put(marker,"PlaceMarkerType");
+                    break;
+                /*
+                default:
+                    marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .title("SuperMarket : " + feature.getProperties().getName())
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
+                    );
+                    dataModel.put("title", feature.getProperties().getName());
+                    dataModel.put("latitude", latitude);
+                    dataModel.put("longitude", longitude);
+                    markers.put(marker, dataModel);
+                    place.setName("SuperMarket : " + feature.getProperties().getName());
+                    place.setAddress(feature.getProperties().getAddress_line2());
+                    placesModelsList.add(place);
+                    listener.put(marker,"PlaceMarkerType");
+                    break;
+
+                 */
+
+            }
         }
     }
 
@@ -478,14 +818,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Legs leg = route.getLegs().get(0);
 
             Log.d("LocationM","data end: " + leg.getEnd_location().getLat() + "Long : " + leg.getEnd_location().getLng() );
-            mGoogleMap.addMarker(new MarkerOptions()
+            if(fragmentType.equals("Main Nav")){
+                dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
+            }else if(fragmentType.equals("Where Nav")){
+                Toast.makeText(context,"Duration : " + leg.getDuration().getText() +" Distance : " + leg.getDistance().getText(),Toast.LENGTH_LONG).show();
+            }
+            //dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
+            Marker endMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getEnd_location().getLat(), leg.getEnd_location().getLng()))
-                    .title("End Location"));
+                    .title("End Location" + " " + leg.getEnd_address()));
 
-            mGoogleMap.addMarker(new MarkerOptions()
+            listener.put(endMarker,"directionMarker");
+            Marker startMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getStart_location().getLat(), leg.getStart_location().getLng()))
-                    .title("Start Location")
+                    .title("Start Location " + leg.getStart_address())
             );
+            listener.put(startMarker,"directionMarker");
 
             List<LatLng> stepList = new ArrayList<>();
 
@@ -498,7 +846,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             List<PatternItem> pattern;
 
-            pattern = Arrays.asList(
+            pattern = Collections.singletonList(
                     new Dash(30));
 
 
@@ -567,7 +915,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void clearUI() {
 
         mGoogleMap.clear();
-
+        getPlacesUrl();
 
     }
 

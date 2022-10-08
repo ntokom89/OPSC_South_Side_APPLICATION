@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/buttonSearch"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -13,7 +14,7 @@
         android:layout_height="match_parent"></com.google.android.gms.maps.MapView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/floatingActionButtonProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -22,20 +23,29 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerViewNav"
-        android:name="com.company.opsc_south_side_application.NavigationFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="499dp"
-        android:visibility="invisible" />
+        android:layout_height="350dp"
+        android:layout_marginTop="300dp"
+        android:visibility="visible" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/autoCompleteDestination"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+        android:id="@+id/fragmentContainerViewWhere"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_below="@id/floatingActionButton"
-        android:layout_marginTop="499dp"
+        android:layout_height="match_parent"
+        android:visibility="visible" />
+
+    <Button
+        android:id="@+id/buttonWhereNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="530dp"
         android:layout_marginBottom="10dp"
+        android:background="@drawable/circle_shape_btn"
+        android:backgroundTint="#FFFFFF"
+        android:text="Where to?"
+        android:textColor="#000000"
+        app:icon="@drawable/ic_baseline_search"
+        app:iconTint="#000000"
         tools:layout="@layout/places_autocomplete_fragment" />
 
 
