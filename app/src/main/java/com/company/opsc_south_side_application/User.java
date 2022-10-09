@@ -6,6 +6,8 @@ public class User {
     private String name;
     private String landmarkPreference;
     private String distanceUnit;
+    private String phoneNumber;
+    private String about;
 
     public User() {
     }
@@ -48,5 +50,21 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 }

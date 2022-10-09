@@ -27,8 +27,10 @@ public class profileFragment extends Fragment {
     //Lesedi
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(user.getUid());
+    //DatabaseReference database = FirebaseDatabase.getInstance().getReference().child(user.getUid());
+    DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Vcz171LR1EfrkfpNBkxz6wzp6fF3");
     TextView phone, email, about, name;
+    TextView settings;
 
     //TODO: Start designing profile page
     // TODO: Rename parameter arguments, choose names that match
@@ -62,11 +64,13 @@ public class profileFragment extends Fragment {
         return fragment;
     }
 
-    public void replaceWithSettings(){
+
+    public void replaceWithSettings(View view){
+        settings = view.findViewById(R.id.settingsTxt);
         Fragment fragment1 = new settingsFragment();
         //Developers, 2021)
-        int transaction = getChildFragmentManager().beginTransaction()
-                .replace(R.id.profileFragment, fragment1).commit();
+         getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainerViewWhere, fragment1).setReorderingAllowed(true).commit();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,26 +92,40 @@ public class profileFragment extends Fragment {
         email = view.findViewById(R.id.emailTxt);
         about = view.findViewById(R.id.aboutTxt);
         name = view.findViewById(R.id.profileNameTxt);
+        settings = view.findViewById(R.id.settingsTxt);
+
+        //replaceWithSettings(view);
 
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                name = (TextView) snapshot.child("name").getValue();
-                name.setText((CharSequence) name);
+                //name = (TextView) snapshot.child("name").getValue();
+                User user = snapshot.getValue(User.class);
+                name.setText( user.getName());
 
-                phone = (TextView) snapshot.child("phoneNumber").getValue();
-                phone.setText((CharSequence) phone);
+               // phone = (TextView) snapshot.child("phoneNumber").getValue();
+                phone.setText( user.getPhoneNumber());
 
-                email = (TextView) snapshot.child("email").getValue();
-                email.setText((CharSequence) email);
+                //email = (TextView) snapshot.child("email").getValue();
+                email.setText( user.getEmail());
 
-                about = (TextView) snapshot.child("about").getValue();
-                about.setText((CharSequence) about);
+                //about = (TextView) snapshot.child("about").getValue();
+                about.setText(user.getAbout());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment1 = new settingsFragment();
+                //Developers, 2021)
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment1).setReorderingAllowed(true).commit();
             }
         });
 

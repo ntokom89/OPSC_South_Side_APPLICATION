@@ -1,15 +1,23 @@
 package com.company.opsc_south_side_application;
 
+import static com.company.opsc_south_side_application.MainActivity.metric;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +25,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,7 +39,7 @@ public class settingsFragment extends Fragment {
     //Lesedi
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(user.getUid());
+    DatabaseReference database = FirebaseDatabase.getInstance().getReference().child(user.getUid());
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -40,9 +50,13 @@ public class settingsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    Toolbar backToProfile;
+    MaterialToolbar backToProfile;
     TextView displayUser;
+    RadioGroup radioGroup;
+    RadioButton buttonSelectedMetric;
     String userDisplayName; //Holds user name from database to pass it to the name textView
+    TextView edit;
+    TextView logout;
 
     public settingsFragment() {
         // Required empty public constructor
@@ -82,6 +96,49 @@ public class settingsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         displayUser = view.findViewById(R.id.userLoggedIn);
+        radioGroup = view.findViewById(R.id.unitsRadioGroup);
+        edit = view.findViewById(R.id.goToEdit);
+        logout = view.findViewById(R.id.logOut);
+
+        if(metric.equals("metric")){
+            buttonSelectedMetric = view.findViewById(R.id.metricRadioBtn);
+            buttonSelectedMetric.toggle();
+        }else if(metric.equals("imperial")){
+            buttonSelectedMetric = view.findViewById(R.id.imperialRadioBtn);
+            buttonSelectedMetric.toggle();
+        }
+
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment1 = new editProfileFragment();
+                //Developers, 2021)
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment1).commit();
+            }
+        });
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                int selectedID = radioGroup.getCheckedRadioButtonId();
+                buttonSelectedMetric = view.findViewById(selectedID);
+                HashMap selectedUnitHashMap = new HashMap();
+
+                selectedUnitHashMap.put("distanceUnit", buttonSelectedMetric.getText().toString().toLowerCase());
+                //... set the value in the email field to the email entered in the edit text
+                database.updateChildren(selectedUnitHashMap).addOnSuccessListener(new OnSuccessListener() {
+                    @Override
+                    public void onSuccess(Object o) {
+                        Toast.makeText(getContext().getApplicationContext(), "Distance Unit updated",Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getContext().getApplicationContext(), "Distance Unit not able to be updated",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
 
         database.addValueEventListener(new ValueEventListener() {
             @Override
@@ -102,23 +159,26 @@ public class settingsFragment extends Fragment {
             public void onClick(View view) {
                 Fragment fragment1 = new profileFragment();
                 //Developers, 2021)
-                int transaction = getChildFragmentManager().beginTransaction()
-                        .replace(R.id.settingsFragment, fragment1).commit();
+                 getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment1).commit();
             }
         });
         // Inflate the layout for this fragment
         return view;
     }
 
+    /*
     //Going to edit profile fragment when Edit Profile is clicked
     public void replaceWithEdit(){
         Fragment fragment1 = new editProfileFragment();
         //Developers, 2021)
-        int transaction = getChildFragmentManager().beginTransaction()
+        getChildFragmentManager().beginTransaction()
                 .replace(R.id.settingsFragment, fragment1).commit();
     }
 
     public void logOut(){
         FirebaseAuth.getInstance().signOut();
     }
+
+     */
 }

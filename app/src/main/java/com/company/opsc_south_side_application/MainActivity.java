@@ -150,6 +150,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+        profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                profileFragment fragment = new profileFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewWhere, fragment).setReorderingAllowed(true).commit();
+                buttonWhere.setVisibility(View.INVISIBLE);
+                profileButton.setVisibility(View.INVISIBLE);
+            }
+        });
         buttonWhere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
