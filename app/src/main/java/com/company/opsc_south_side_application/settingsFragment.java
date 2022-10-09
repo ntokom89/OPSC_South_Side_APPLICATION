@@ -1,13 +1,19 @@
 package com.company.opsc_south_side_application;
 
+import static com.company.opsc_south_side_application.MainActivity.landmarkPreference;
+import static com.company.opsc_south_side_application.MainActivity.mGoogleMap;
 import static com.company.opsc_south_side_application.MainActivity.metric;
+import static com.company.opsc_south_side_application.MainActivity.placesModelsList;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -26,7 +32,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,6 +65,8 @@ public class settingsFragment extends Fragment {
     String userDisplayName; //Holds user name from database to pass it to the name textView
     TextView edit;
     TextView logout;
+    Spinner spinnerLandmarks;
+    int count = 0;
 
     public settingsFragment() {
         // Required empty public constructor
@@ -93,13 +103,16 @@ public class settingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         displayUser = view.findViewById(R.id.userLoggedIn);
         radioGroup = view.findViewById(R.id.unitsRadioGroup);
         edit = view.findViewById(R.id.goToEdit);
         logout = view.findViewById(R.id.logOut);
+        spinnerLandmarks = view.findViewById(R.id.spinnerLandmark);
 
+        setUpSpinner();
         if(metric.equals("metric")){
             buttonSelectedMetric = view.findViewById(R.id.metricRadioBtn);
             buttonSelectedMetric.toggle();
@@ -165,6 +178,62 @@ public class settingsFragment extends Fragment {
         });
         // Inflate the layout for this fragment
         return view;
+    }
+
+    public void setUpSpinner(){
+
+        List<String> landmarks = new ArrayList<String>();
+
+        //List<String> landmarks = new ArrayList<String>();
+        landmarks.add("Gas Station");
+        landmarks.add("Restaurant");
+        landmarks.add("Museum");
+        landmarks.add("Park");
+        landmarks.add("Supermarket");
+        landmarks.add("None");
+
+        spinnerLandmarks.setPrompt(landmarkPreference);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext().getApplicationContext(), android.R.layout.simple_spinner_item, landmarks);
+        Toast.makeText(getContext().getApplicationContext(), "landmark preference is" + landmarkPreference,Toast.LENGTH_LONG).show();
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinnerLandmarks.setAdapter(dataAdapter);
+        spinnerLandmarks.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String landmark= landmarks.get(i);
+                if(landmark.equals(landmarkPreference) || count == 0){
+                    count++;
+                }else{
+                    HashMap selectedUnitHashMap = new HashMap();
+
+                    selectedUnitHashMap.put("landmarkPreference", landmark);
+                    //... set the value in the email field to the email entered in the edit text
+                    database.updateChildren(selectedUnitHashMap).addOnSuccessListener(new OnSuccessListener() {
+                        @Override
+                        public void onSuccess(Object o) {
+                            placesModelsList.clear();
+                            mGoogleMap.clear();
+                            Toast.makeText(getContext().getApplicationContext(), "landmark preference  updated",Toast.LENGTH_LONG).show();
+                            //count++;
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getContext().getApplicationContext(), "landmark preference  not able to be updated",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
     }
 
     /*

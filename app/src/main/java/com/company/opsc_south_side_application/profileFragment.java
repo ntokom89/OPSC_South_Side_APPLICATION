@@ -1,9 +1,13 @@
 package com.company.opsc_south_side_application;
 
+import static com.company.opsc_south_side_application.MainActivity.buttonWhere;
+import static com.company.opsc_south_side_application.MainActivity.profileButton;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,7 +26,7 @@ import com.google.firebase.database.ValueEventListener;
  * Use the {@link profileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class profileFragment extends Fragment {
+public class profileFragment extends Fragment  {
 
     //Lesedi
 
@@ -31,6 +35,7 @@ public class profileFragment extends Fragment {
     DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Vcz171LR1EfrkfpNBkxz6wzp6fF3");
     TextView phone, email, about, name;
     TextView settings;
+    ImageButton backButton;
 
     //TODO: Start designing profile page
     // TODO: Rename parameter arguments, choose names that match
@@ -93,7 +98,7 @@ public class profileFragment extends Fragment {
         about = view.findViewById(R.id.aboutTxt);
         name = view.findViewById(R.id.profileNameTxt);
         settings = view.findViewById(R.id.settingsTxt);
-
+        backButton = view.findViewById(R.id.imageButtonBackProfile);
         //replaceWithSettings(view);
 
         database.addValueEventListener(new ValueEventListener() {
@@ -128,10 +133,20 @@ public class profileFragment extends Fragment {
                         .replace(R.id.fragmentContainerViewWhere, fragment1).setReorderingAllowed(true).commit();
             }
         });
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getParentFragmentManager().beginTransaction().remove(profileFragment.this).commit();
+                buttonWhere.setVisibility(View.VISIBLE);
+                profileButton.setVisibility(View.VISIBLE);
+            }
+        });
 
 
         // Inflate the layout for this fragment
         return view;
 
     }
+
+
 }

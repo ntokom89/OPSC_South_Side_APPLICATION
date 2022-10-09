@@ -17,6 +17,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.net.MalformedURLException;
@@ -125,6 +127,7 @@ public class NavigationFragment extends Fragment{
                     chosenMode = false;
                 }else{
                     mode = "mode=walking";
+                    Toast.makeText(requireContext().getApplicationContext(),"Walking mode chosen",Toast.LENGTH_SHORT).show();
                     walkButton.setBackgroundColor(000000);
                     chosenMode = true;
                 }
@@ -138,6 +141,7 @@ public class NavigationFragment extends Fragment{
                     chosenMode = false;
                 }else{
                     mode = "mode=driving";
+                    Toast.makeText(requireContext().getApplicationContext(),"Driving mode chosen",Toast.LENGTH_SHORT).show();
                     walkButton.setBackgroundColor(000000);
                     chosenMode = true;
                 }
@@ -151,6 +155,7 @@ public class NavigationFragment extends Fragment{
                     chosenMode = false;
                 }else{
                     mode = "mode=BICYCLING";
+                    Toast.makeText(requireContext().getApplicationContext(),"Bicycle mode chosen",Toast.LENGTH_SHORT).show();
                     walkButton.setBackgroundColor(000000);
                     chosenMode = true;
                 }
@@ -164,6 +169,7 @@ public class NavigationFragment extends Fragment{
                     chosenMode = false;
                 }else{
                     mode = "mode=transit";
+                    Toast.makeText(requireContext().getApplicationContext(),"Public Transit mode chosen",Toast.LENGTH_SHORT).show();
                     walkButton.setBackgroundColor(000000);
                     chosenMode = true;
                 }
@@ -200,10 +206,39 @@ public class NavigationFragment extends Fragment{
         favouriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addPlaceToFirebase(place);
+                Log.d("favourite place", String.valueOf(isFavouritePlace));
+                if(isFavouritePlace){
+                    deletePlaceAtFirebase(place);
+                    Log.d("favourite place", "deleting place at database");
+                }else{
+                    addPlaceToFirebase(place);
+                    Log.d("favourite place", "adding place at database");
+                }
+
             }
         });
         return view;
+    }
+
+    private void deletePlaceAtFirebase(PlacesModel placesModel) {
+        Query query = databaseReference.child("FavouritePlaces").orderByChild("placeID").equalTo(placesModel.getPlaceID());
+        Log.d("favourite place",""+placesModel.getPlaceID());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot appleSnapshot: snapshot.getChildren()) {
+                    appleSnapshot.getRef().removeValue();
+                    favouriteButton.setImageResource(R.drawable.ic_favourite_empty);
+                    Toast.makeText(requireContext().getApplicationContext(),"Place deleted from database.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(requireContext().getApplicationContext(),"Place unable to be deleted from database.", Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     public void setUpFragmentUi(String distanceS, String durationS){
@@ -226,6 +261,7 @@ public class NavigationFragment extends Fragment{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String placeID = databaseReference.push().getKey();
+                placesModel.setPlaceID(placeID);
                 databaseReference.child("FavouritePlaces").child(placeID).setValue(placesModel);
                 Toast.makeText(requireContext().getApplicationContext(),"Place added to database",Toast.LENGTH_LONG).show();
                 favouriteButton.setImageResource(R.drawable.ic_baseline_favorite_full);

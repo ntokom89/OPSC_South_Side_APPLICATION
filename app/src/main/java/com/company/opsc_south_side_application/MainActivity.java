@@ -290,9 +290,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //containerView.setVisibility(View.VISIBLE);
                     buttonWhere.setVisibility(View.INVISIBLE);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewNav, dialogFragment).setReorderingAllowed(true).commit();
-                    for(PlacesModel place : favouritePlacesModelsList){
-                        if(place.getLatitude().equals(marker.getPosition().latitude) && place.getLongitude().equals(marker.getPosition().longitude)){
+                    for(PlacesModel place1 : favouritePlacesModelsList){
+                        if(place1.getLatitude().equals(marker.getPosition().latitude) && place1.getLongitude().equals(marker.getPosition().longitude)){
                             isFavouritePlace = true;
+                            place.setPlaceID(place1.getPlaceID());
                         }
                     }
                     //dialogFragment.show(getSupportFragmentManager(), "My  Fragment");
@@ -685,7 +686,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("Restaurant : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.ic_baseline_restaurant))
                     );
                     dataModel.put("title", feature.getProperties().getName());
                     dataModel.put("latitude", latitude);
@@ -698,6 +699,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
                     placesModelsList.add(place);
+                    titleList.put(marker,"Restaurant : " + feature.getProperties().getName());
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Museum":
@@ -717,6 +719,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
                     placesModelsList.add(place);
+                    titleList.put(marker,"Museum : " + feature.getProperties().getName());
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Park":
@@ -735,6 +738,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
                     placesModelsList.add(place);
+                    titleList.put(marker,"Park : " + feature.getProperties().getName());
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Supermarket":
@@ -753,6 +757,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     place.setPlaceType(mode);
                     placesModelsList.add(place);
                     markers.put(marker, dataModel);
+                    titleList.put(marker,"SuperMarket : " + feature.getProperties().getName());
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 /*
@@ -820,12 +825,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
             Marker endMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getEnd_location().getLat(), leg.getEnd_location().getLng()))
-                    .title("End Location" + " " + leg.getEnd_address()));
+                    .title("End Location"));
 
             listener.put(endMarker,"directionMarker");
             Marker startMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getStart_location().getLat(), leg.getStart_location().getLng()))
-                    .title("Start Location " + leg.getStart_address())
+                    .title("Start Location ")
             );
             listener.put(startMarker,"directionMarker");
 
@@ -906,7 +911,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onStop();
     }
 
-    private void clearUI() {
+    public void clearUI() {
 
         mGoogleMap.clear();
         getPlacesUrl();
