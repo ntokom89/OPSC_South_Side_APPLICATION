@@ -102,15 +102,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     User user;
     public static String landmarkPreference;
     private List<Routes> routes;
-    FloatingActionButton button;
     String firebaseUser;
     FirebaseAuth firebaseAuth;
     public static DatabaseReference databaseReference;
     public static Button buttonWhere;
-    public static  Hashtable<Marker, Map<String, Object>> markers = new Hashtable<>();
-    public static  Map<String, Object> dataModel = new HashMap<>();
+    public static  Hashtable<Marker, PlacesModel> markers = new Hashtable<>();
     public static Hashtable<Marker,String> listener = new Hashtable<Marker,String>();
-    public static Hashtable<Marker,String> titleList = new Hashtable<Marker,String>();
     public static ArrayList<PlacesModel> placesModelsList = new ArrayList<>();
     public static ArrayList<PlacesModel> favouritePlacesModelsList = new ArrayList<>();
     public static NavigationFragment dialogFragment = new NavigationFragment();
@@ -271,17 +268,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Map dataModel = markers.get(marker);
+                PlacesModel placeMarker = markers.get(marker);
                 String markerType = listener.get(marker);
                 if(markerType.equals("PlaceMarkerType")) {
                     isFavouritePlace = false;
-                    title = titleList.get(marker);
                     place = new PlacesModel();
                     place.setLatitude(marker.getPosition().latitude);
                     place.setLongitude(marker.getPosition().longitude);
-                    place.setPlaceType((String) dataModel.get("placeType"));
-                    place.setName(title);
-                    place.setAddress((String) dataModel.get("address"));
+                    place.setPlaceType(placeMarker.getPlaceType());
+                    place.setName(placeMarker.getName());
+                    place.setAddress(placeMarker.getAddress());
                     dest = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
                     dialogFragment=new NavigationFragment();
 
@@ -669,18 +665,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_local_gas_station_black_24dp))
 
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
                     listener.put(marker,"PlaceMarkerType");
                     place.setName("Gas Station : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
-                    titleList.put(marker,"Gas Station : " + feature.getProperties().getName());
                     break;
                 case "Restaurant":
                     marker = mGoogleMap.addMarker(new MarkerOptions()
@@ -688,18 +680,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .title("Restaurant : " + feature.getProperties().getName())
                             .icon(bitmapDescriptorFromVector(context, R.drawable.ic_baseline_restaurant))
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
-
                     place.setName("Restaurant : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
-                    titleList.put(marker,"Restaurant : " + feature.getProperties().getName());
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Museum":
@@ -709,17 +696,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_museum_black_24dp))
 
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
                     place.setName("Museum : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
-                    titleList.put(marker,"Museum : " + feature.getProperties().getName());
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Park":
@@ -728,17 +711,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .title("Park : " + feature.getProperties().getName())
                             .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_park_black_24dp))
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
                     place.setName("Park : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
-                    titleList.put(marker,"Park : " + feature.getProperties().getName());
                     listener.put(marker,"PlaceMarkerType");
                     break;
                 case "Supermarket":
@@ -747,37 +726,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .title("SuperMarket : " + feature.getProperties().getName())
                             .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
                     place.setName("SuperMarket : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
-                    placesModelsList.add(place);
-                    markers.put(marker, dataModel);
-                    titleList.put(marker,"SuperMarket : " + feature.getProperties().getName());
-                    listener.put(marker,"PlaceMarkerType");
-                    break;
-                /*
-                default:
-                    marker = mGoogleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latitude, longitude))
-                            .title("SuperMarket : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
-                    );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    markers.put(marker, dataModel);
-                    place.setName("SuperMarket : " + feature.getProperties().getName());
-                    place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
-
-                 */
 
             }
         }
@@ -861,32 +818,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
 
             options.addAll(stepList);
-
-
-            /*
-            for (Routes route: routes) {
-
-                for (Legs leg : route.getLegs()) {
-
-                    double lat = leg.getEnd_location().getLat();
-                    double lng = leg.getEnd_location().getLng();
-
-                    double lat2 = leg.getStart_location().getLat();
-                    double lng2 = leg.getEnd_location().getLng();
-                    LatLng position = new LatLng(lat, lng);
-                    LatLng position2 = new LatLng(lat2, lng2);
-                    points.add(position);
-                    points.add(position2);
-                }
-
-                lineOptions.addAll(points);
-                lineOptions.width(12);
-                lineOptions.color(Color.BLUE);
-                lineOptions.geodesic(true);
-
-            }
-
-             */
 
 // Drawing polyline in the Google Map for the i-th route
             Polyline polyline = mGoogleMap.addPolyline(options);

@@ -18,7 +18,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="680dp"
+                android:layout_height="750dp"
                 android:background="#ECE4E4"
                 app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
                 app:layout_constraintTop_toTopOf="@+id/linearLayout3">
@@ -219,7 +219,7 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewFavourites"
-                            android:layout_width="360dp"
+                            android:layout_width="match_parent"
                             android:layout_height="153dp" />
                     </LinearLayout>
                 </androidx.core.widget.NestedScrollView>
