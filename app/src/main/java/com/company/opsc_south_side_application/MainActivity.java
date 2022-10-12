@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     private void signInWithAccountTest(String email, String password) {
 
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
@@ -199,6 +199,56 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    private void RegisterUserToFirebaseTest(String email, String password, String name) {
+
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPhoneNumber("");
+        user.setDistanceUnit("metric");
+        user.setLandmarkPreference("None");
+        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    FirebaseUser userFirebase = firebaseAuth.getCurrentUser();
+                    firebaseUser = firebaseAuth.getUid();
+                    addToFirebase(user);
+                    Log.d("userID",firebaseUser);
+                    // = "0q89wT3EOGf0k1ostjHeqJ3eZIH3";
+                    databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+                    loadFirebaseData();
+                    Toast.makeText(MainActivity.this,"Registration successful",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this,"Check your email or password",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+    }
+
+    private void addToFirebase(User user) {
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //databaseReference.setValue(email);
+                databaseReference.child(user.getUserID()).setValue(user);
+                //databaseReference.child("password").setValue(password);
+                Toast.makeText(getContext().getApplicationContext(),"User details added to database ",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext().getApplicationContext(),"Database error",Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    //Method to load firebase data from the database with user and their settings and favourite places
+    //https://www.geeksforgeeks.org/how-to-populate-recyclerview-with-firebase-data-using-firebaseui-in-android-studio/ GeeksforGeeks
     public void loadFirebaseData(){
         DatabaseReference placesListFirebase = databaseReference.child("FavouritePlaces");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -209,11 +259,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 landmarkPreference = user.getLandmarkPreference();
                 getPlacesUrl();
                 Log.d("Firebase data details", "metric : " + metric +", landmarkpreference : " + landmarkPreference);
-                //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
-
-                //Declare the adapter and set it to the recyclerView
-                //progress_circular.setVisibility(View.GONE);
-
                 placesListFirebase.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -265,6 +310,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.getUiSettings().setMapToolbarEnabled(false);
         //mGoogleMap.getUiSettings().setCompassEnabled(true);
         getLastLocation();
+        //Method to set click listener for marker
+        //https://www.digitalocean.com/community/tutorials/android-passing-data-between-fragments
+        //https://stackoverflow.com/questions/72900044/helpattempt-to-invoke-virtual-method-void-android-widget-textview-settextjav itay bielski
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -305,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //Method to decode the polylines
+    //https://abhiandroid.com/programming/googlemaps
     private List<LatLng> decode(String points) {
 
         int len = points.length();
@@ -354,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onSaveInstanceState(mapViewBundle);
     }
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // If request is cancelled, the result arrays are empty.
@@ -372,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
         // check if permissions are given
@@ -415,6 +467,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     @SuppressLint("MissingPermission")
     private void requestNewLocationData() {
 
@@ -434,7 +487,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
     }
 
-
+    //Location callback
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private LocationCallback mLocationCallback = new LocationCallback() {
 
         @Override
@@ -452,15 +506,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     };
 
     // method to check for permissions
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private boolean checkPermissions() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
-        // If we want background location
-        // on Android 10.0 and higher,
-        // use:
-        // ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private void requestPermissions() {
         ActivityCompat.requestPermissions(this, new String[]{
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -469,6 +521,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // method to check
     // if location is enabled
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -483,6 +536,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+    //Method to construct the directions url for the Google directions API
+    //https://abhiandroid.com/programming/googlemaps
     public static String getDirectionsUrl(LatLng origin, LatLng dest, String mode, String distanceUnit) {
 
         // Origin of route
@@ -512,6 +567,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return url;
     }
 
+    //A method to send a request and retrieve the response from the URL sent.
+    //
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection =
                 (HttpURLConnection) url.openConnection();
@@ -529,7 +586,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             urlConnection.disconnect();
         }
     }
-    public void impelemntFetchDirection(URL url){
+
+    public void impelementFetchDirection(URL url){
         new fetchDirectionsData().execute(url);
     }
 
@@ -565,6 +623,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Method to get list of places from Geoapify service place API
+    //https://www.geoapify.com/places-api
     private String downloadPlacesUrl(String category){
         String url;
         switch (category){
@@ -591,6 +651,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return url;
     }
 
+    //method to get the places URL
     private  void getPlacesUrl(){
         Gson gson = new Gson();
         URL url1;
@@ -608,6 +669,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //A async Task method to fetch places data and consume it via GSON
+    //https://www.digitalocean.com/community/tutorials/android-google-map-drawing-route-two-points
     public class fetchPlacesData extends AsyncTask<URL, Void, String> {
 
         @Override
@@ -632,6 +695,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Method to consume GSON places and place markers with them.
     private void consumeGsonPlaces(String propertiesData) {
         Gson gson = new Gson();
         Marker marker;
@@ -741,17 +805,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    //Consume GSON of the routes for the directions data
     protected void consumeGson(String directionsJSON) {
         if (directionsJSON != null) {
 
             Gson gson = new Gson();
-            Root weatherData = gson.fromJson(directionsJSON, Root.class);
-            routes = weatherData.getRoutes();
+            Root routesData = gson.fromJson(directionsJSON, Root.class);
+            routes = routesData.getRoutes();
         }else{
 
         }
     }
 
+    //A class that parses the routes data to draw routes between two points.
+    //https://www.digitalocean.com/community/tutorials/android-google-map-drawing-route-two-points
     private class ParserTask extends AsyncTask<Void, Integer,List<Routes>> {
 
         // Parsing the data in non-ui thread

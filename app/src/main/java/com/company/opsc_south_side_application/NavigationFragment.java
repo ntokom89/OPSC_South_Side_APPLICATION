@@ -185,7 +185,7 @@ public class NavigationFragment extends Fragment{
                     fragmentType = "Main Nav";
                     urlConnection = new URL(url);
                     MainActivity main = new MainActivity();
-                    main.impelemntFetchDirection(urlConnection);
+                    main.impelementFetchDirection(urlConnection);
                     //new MainActivity.fetchDirectionsData().execute(urlConnection);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -219,7 +219,8 @@ public class NavigationFragment extends Fragment{
         });
         return view;
     }
-
+    //Method to delete favourite place at firebase database
+    //
     private void deletePlaceAtFirebase(PlacesModel placesModel) {
         Query query = databaseReference.child("FavouritePlaces").orderByChild("placeID").equalTo(placesModel.getPlaceID());
         Log.d("favourite place",""+placesModel.getPlaceID());

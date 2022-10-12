@@ -93,6 +93,9 @@ public class WhereNavigationFragment extends Fragment {
         }
     }
 
+    //method to create all UI components in fragments
+    //https://stackoverflow.com/questions/41345987/how-to-use-placeautocompletefragment-widget-in-a-fragment Jordon
+    //https://stackoverflow.com/questions/21824542/android-scrollview-inside-another-scrollview-doesnt-scroll Volodymyr Kulyk
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -123,7 +126,7 @@ public class WhereNavigationFragment extends Fragment {
                     fragmentType = "Where Nav";
                     urlConnection = new URL(url);
                     MainActivity main = new MainActivity();
-                    main.impelemntFetchDirection(urlConnection);
+                    main.impelementFetchDirection(urlConnection);
                     //new MainActivity.fetchDirectionsData().execute(urlConnection);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();

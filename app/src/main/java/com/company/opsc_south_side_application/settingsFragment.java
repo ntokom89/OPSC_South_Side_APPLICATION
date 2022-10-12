@@ -131,6 +131,8 @@ public class settingsFragment extends Fragment {
             }
         });
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            //method to check radiogroup if there are any changes on each button
+            //https://firebase.google.com/docs/database/admin/save-data
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 int selectedID = radioGroup.getCheckedRadioButtonId();

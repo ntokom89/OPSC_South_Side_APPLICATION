@@ -70,13 +70,7 @@ public class profileFragment extends Fragment  {
     }
 
 
-    public void replaceWithSettings(View view){
-        settings = view.findViewById(R.id.settingsTxt);
-        Fragment fragment1 = new settingsFragment();
-        //Developers, 2021)
-         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainerViewWhere, fragment1).setReorderingAllowed(true).commit();
-    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
