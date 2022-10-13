@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
 
         firebaseUser = firebaseAuth.getUid();
-         firebaseUser = "Vcz171LR1EfrkfpNBkxz6wzp6fF3";
+         //firebaseUser = "Vcz171LR1EfrkfpNBkxz6wzp6fF3";
         databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
 
 
@@ -179,73 +179,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.getMapAsync(this);
 
     }
-    private void signInWithAccountTest(String email, String password) {
 
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    FirebaseUser userFirebase = firebaseAuth.getCurrentUser();
-                    firebaseUser = firebaseAuth.getUid();
-                    Log.d("userID",firebaseUser);
-                    // = "0q89wT3EOGf0k1ostjHeqJ3eZIH3";
-                    databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
-                    loadFirebaseData();
-                    Toast.makeText(MainActivity.this,"Login successful",Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(MainActivity.this,"Check your email or password",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
 
-    private void RegisterUserToFirebaseTest(String email, String password, String name) {
-
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhoneNumber("");
-        user.setDistanceUnit("metric");
-        user.setLandmarkPreference("None");
-        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    FirebaseUser userFirebase = firebaseAuth.getCurrentUser();
-                    firebaseUser = firebaseAuth.getUid();
-                    addToFirebase(user);
-                    Log.d("userID",firebaseUser);
-                    // = "0q89wT3EOGf0k1ostjHeqJ3eZIH3";
-                    databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
-                    loadFirebaseData();
-                    Toast.makeText(MainActivity.this,"Registration successful",Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(MainActivity.this,"Check your email or password",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-    }
-
-    private void addToFirebase(User user) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                //databaseReference.setValue(email);
-                databaseReference.child(user.getUserID()).setValue(user);
-                //databaseReference.child("password").setValue(password);
-                Toast.makeText(getContext().getApplicationContext(),"User details added to database ",Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext().getApplicationContext(),"Database error",Toast.LENGTH_LONG).show();
-            }
-        });
-
-    }
 
     //Method to load firebase data from the database with user and their settings and favourite places
     //https://www.geeksforgeeks.org/how-to-populate-recyclerview-with-firebase-data-using-firebaseui-in-android-studio/ GeeksforGeeks

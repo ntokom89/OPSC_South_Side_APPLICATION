@@ -16,8 +16,7 @@
         tools:layout_editor_absoluteY="35dp" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView"
-        android:name="com.company.opsc_south_side_application.LoginFragment"
+        android:id="@+id/fragmentContainerViewLoginRegsiter"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="199dp"

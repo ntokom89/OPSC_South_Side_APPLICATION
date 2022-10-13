@@ -10,5 +10,8 @@ public class LoginRegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_registration);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewLoginRegsiter,new LoginFragment()).setReorderingAllowed(true).commit();
+
     }
 }
