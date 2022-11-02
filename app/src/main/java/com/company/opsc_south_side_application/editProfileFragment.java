@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -19,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -150,8 +153,16 @@ public class editProfileFragment extends Fragment {
     private boolean emailChanged() {
         //if email from database does not match email entered in edit text...
         if(!userEmail.equals(email.getText().toString())){
+            HashMap emailHash = new HashMap();
+
+            emailHash.put("email", email.getText().toString());
             //... set the value in the email field to the email entered in the edit text
-            database.child(userEmail).child("email").setValue(email.getText().toString());
+            database.child(userEmail).updateChildren(emailHash).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Toast.makeText(getContext().getApplicationContext(), "Email updated",Toast.LENGTH_SHORT).show();
+                }
+            });
             return true;
         } else {
             return false;

@@ -1,9 +1,13 @@
 package com.company.opsc_south_side_application;
 
+import static com.company.opsc_south_side_application.MainActivity.buttonWhere;
+import static com.company.opsc_south_side_application.MainActivity.profileButton;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,13 +26,16 @@ import com.google.firebase.database.ValueEventListener;
  * Use the {@link profileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class profileFragment extends Fragment {
+public class profileFragment extends Fragment  {
 
     //Lesedi
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(user.getUid());
+    //DatabaseReference database = FirebaseDatabase.getInstance().getReference().child(user.getUid());
+    DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Vcz171LR1EfrkfpNBkxz6wzp6fF3");
     TextView phone, email, about, name;
+    TextView settings;
+    ImageButton backButton;
 
     //TODO: Start designing profile page
     // TODO: Rename parameter arguments, choose names that match
@@ -62,12 +69,8 @@ public class profileFragment extends Fragment {
         return fragment;
     }
 
-    public void replaceWithSettings(){
-        Fragment fragment1 = new settingsFragment();
-        //Developers, 2021)
-        int transaction = getChildFragmentManager().beginTransaction()
-                .replace(R.id.profileFragment, fragment1).commit();
-    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,21 +91,25 @@ public class profileFragment extends Fragment {
         email = view.findViewById(R.id.emailTxt);
         about = view.findViewById(R.id.aboutTxt);
         name = view.findViewById(R.id.profileNameTxt);
+        settings = view.findViewById(R.id.settingsTxt);
+        backButton = view.findViewById(R.id.imageButtonBackProfile);
+        //replaceWithSettings(view);
 
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                name = (TextView) snapshot.child("name").getValue();
-                name.setText((CharSequence) name);
+                //name = (TextView) snapshot.child("name").getValue();
+                User user = snapshot.getValue(User.class);
+                name.setText( user.getName());
 
-                phone = (TextView) snapshot.child("phoneNumber").getValue();
-                phone.setText((CharSequence) phone);
+               // phone = (TextView) snapshot.child("phoneNumber").getValue();
+                phone.setText( user.getPhoneNumber());
 
-                email = (TextView) snapshot.child("email").getValue();
-                email.setText((CharSequence) email);
+                //email = (TextView) snapshot.child("email").getValue();
+                email.setText( user.getEmail());
 
-                about = (TextView) snapshot.child("about").getValue();
-                about.setText((CharSequence) about);
+                //about = (TextView) snapshot.child("about").getValue();
+                about.setText(user.getAbout());
             }
 
             @Override
@@ -111,9 +118,29 @@ public class profileFragment extends Fragment {
             }
         });
 
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment1 = new settingsFragment();
+                //Developers, 2021)
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment1).setReorderingAllowed(true).commit();
+            }
+        });
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getParentFragmentManager().beginTransaction().remove(profileFragment.this).commit();
+                buttonWhere.setVisibility(View.VISIBLE);
+                profileButton.setVisibility(View.VISIBLE);
+            }
+        });
+
 
         // Inflate the layout for this fragment
         return view;
 
     }
+
+
 }

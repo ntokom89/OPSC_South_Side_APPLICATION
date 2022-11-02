@@ -54,6 +54,10 @@ dependencies {
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'com.google.maps.android:android-maps-utils:2.4.0'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
+<<<<<<< HEAD
 
     implementation 'de.hdodenhof:circleimageview:2.0.0'
+=======
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+>>>>>>> 638e066aefbf4b6aad92520eb1c37ae3ba9c1564
 }

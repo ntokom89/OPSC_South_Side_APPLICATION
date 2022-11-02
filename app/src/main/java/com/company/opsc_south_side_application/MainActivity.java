@@ -110,15 +110,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     User user;
     public static String landmarkPreference;
     private List<Routes> routes;
-    FloatingActionButton button;
     String firebaseUser;
     FirebaseAuth firebaseAuth;
     public static DatabaseReference databaseReference;
     public static Button buttonWhere;
-    public static  Hashtable<Marker, Map<String, Object>> markers = new Hashtable<>();
-    public static  Map<String, Object> dataModel = new HashMap<>();
+    public static  Hashtable<Marker, PlacesModel> markers = new Hashtable<>();
     public static Hashtable<Marker,String> listener = new Hashtable<Marker,String>();
-    public static Hashtable<Marker,String> titleList = new Hashtable<Marker,String>();
     public static ArrayList<PlacesModel> placesModelsList = new ArrayList<>();
     public static ArrayList<PlacesModel> favouritePlacesModelsList = new ArrayList<>();
     public static NavigationFragment dialogFragment = new NavigationFragment();
@@ -165,6 +162,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+        profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                profileFragment fragment = new profileFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewWhere, fragment).setReorderingAllowed(true).commit();
+                buttonWhere.setVisibility(View.INVISIBLE);
+                profileButton.setVisibility(View.INVISIBLE);
+            }
+        });
         buttonWhere.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -190,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     private void signInWithAccountTest(String email, String password) {
 
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
@@ -208,6 +214,56 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    private void RegisterUserToFirebaseTest(String email, String password, String name) {
+
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPhoneNumber("");
+        user.setDistanceUnit("metric");
+        user.setLandmarkPreference("None");
+        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    FirebaseUser userFirebase = firebaseAuth.getCurrentUser();
+                    firebaseUser = firebaseAuth.getUid();
+                    addToFirebase(user);
+                    Log.d("userID",firebaseUser);
+                    // = "0q89wT3EOGf0k1ostjHeqJ3eZIH3";
+                    databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+                    loadFirebaseData();
+                    Toast.makeText(MainActivity.this,"Registration successful",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this,"Check your email or password",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+    }
+
+    private void addToFirebase(User user) {
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //databaseReference.setValue(email);
+                databaseReference.child(user.getUserID()).setValue(user);
+                //databaseReference.child("password").setValue(password);
+                Toast.makeText(getContext().getApplicationContext(),"User details added to database ",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext().getApplicationContext(),"Database error",Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    //Method to load firebase data from the database with user and their settings and favourite places
+    //https://www.geeksforgeeks.org/how-to-populate-recyclerview-with-firebase-data-using-firebaseui-in-android-studio/ GeeksforGeeks
     public void loadFirebaseData(){
         DatabaseReference placesListFirebase = databaseReference.child("FavouritePlaces");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -218,11 +274,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 landmarkPreference = user.getLandmarkPreference();
                 getPlacesUrl();
                 Log.d("Firebase data details", "metric : " + metric +", landmarkpreference : " + landmarkPreference);
-                //signInWithAccountTest("ntokozomweli001@gmail.com","ntokozo@1");
-
-                //Declare the adapter and set it to the recyclerView
-                //progress_circular.setVisibility(View.GONE);
-
                 placesListFirebase.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -274,20 +325,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.getUiSettings().setMapToolbarEnabled(false);
         //mGoogleMap.getUiSettings().setCompassEnabled(true);
         getLastLocation();
+        //Method to set click listener for marker
+        //https://www.digitalocean.com/community/tutorials/android-passing-data-between-fragments
+        //https://stackoverflow.com/questions/72900044/helpattempt-to-invoke-virtual-method-void-android-widget-textview-settextjav itay bielski
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Map dataModel = markers.get(marker);
+                PlacesModel placeMarker = markers.get(marker);
                 String markerType = listener.get(marker);
                 if(markerType.equals("PlaceMarkerType")) {
                     isFavouritePlace = false;
-                    title = titleList.get(marker);
                     place = new PlacesModel();
                     place.setLatitude(marker.getPosition().latitude);
                     place.setLongitude(marker.getPosition().longitude);
-                    place.setPlaceType((String) dataModel.get("placeType"));
-                    place.setName(title);
-                    place.setAddress((String) dataModel.get("address"));
+                    place.setPlaceType(placeMarker.getPlaceType());
+                    place.setName(placeMarker.getName());
+                    place.setAddress(placeMarker.getAddress());
                     dest = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
                     dialogFragment=new NavigationFragment();
 
@@ -296,9 +349,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //containerView.setVisibility(View.VISIBLE);
                     buttonWhere.setVisibility(View.INVISIBLE);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerViewNav, dialogFragment).setReorderingAllowed(true).commit();
-                    for(PlacesModel place : favouritePlacesModelsList){
-                        if(place.getLatitude().equals(marker.getPosition().latitude) && place.getLongitude().equals(marker.getPosition().longitude)){
+                    for(PlacesModel place1 : favouritePlacesModelsList){
+                        if(place1.getLatitude().equals(marker.getPosition().latitude) && place1.getLongitude().equals(marker.getPosition().longitude)){
                             isFavouritePlace = true;
+                            place.setPlaceID(place1.getPlaceID());
                         }
                     }
                     //dialogFragment.show(getSupportFragmentManager(), "My  Fragment");
@@ -314,6 +368,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //Method to decode the polylines
+    //https://abhiandroid.com/programming/googlemaps
     private List<LatLng> decode(String points) {
 
         int len = points.length();
@@ -363,6 +419,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onSaveInstanceState(mapViewBundle);
     }
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // If request is cancelled, the result arrays are empty.
@@ -381,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
         // check if permissions are given
@@ -424,6 +482,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     @SuppressLint("MissingPermission")
     private void requestNewLocationData() {
 
@@ -443,7 +502,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
     }
 
-
+    //Location callback
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private LocationCallback mLocationCallback = new LocationCallback() {
 
         @Override
@@ -461,15 +521,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     };
 
     // method to check for permissions
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private boolean checkPermissions() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
-        // If we want background location
-        // on Android 10.0 and higher,
-        // use:
-        // ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private void requestPermissions() {
         ActivityCompat.requestPermissions(this, new String[]{
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -478,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // method to check
     // if location is enabled
+    //https://www.geeksforgeeks.org/how-to-get-user-location-in-android/
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -492,6 +551,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+    //Method to construct the directions url for the Google directions API
+    //https://abhiandroid.com/programming/googlemaps
     public static String getDirectionsUrl(LatLng origin, LatLng dest, String mode, String distanceUnit) {
 
         // Origin of route
@@ -521,6 +582,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return url;
     }
 
+    //A method to send a request and retrieve the response from the URL sent.
+    //
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection =
                 (HttpURLConnection) url.openConnection();
@@ -538,7 +601,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             urlConnection.disconnect();
         }
     }
-    public void impelemntFetchDirection(URL url){
+
+    public void impelementFetchDirection(URL url){
         new fetchDirectionsData().execute(url);
     }
 
@@ -574,6 +638,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Method to get list of places from Geoapify service place API
+    //https://www.geoapify.com/places-api
     private String downloadPlacesUrl(String category){
         String url;
         switch (category){
@@ -600,6 +666,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return url;
     }
 
+    //method to get the places URL
     private  void getPlacesUrl(){
         Gson gson = new Gson();
         URL url1;
@@ -617,6 +684,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //A async Task method to fetch places data and consume it via GSON
+    //https://www.digitalocean.com/community/tutorials/android-google-map-drawing-route-two-points
     public class fetchPlacesData extends AsyncTask<URL, Void, String> {
 
         @Override
@@ -641,6 +710,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Method to consume GSON places and place markers with them.
     private void consumeGsonPlaces(String propertiesData) {
         Gson gson = new Gson();
         Marker marker;
@@ -674,35 +744,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_local_gas_station_black_24dp))
 
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
                     listener.put(marker,"PlaceMarkerType");
                     place.setName("Gas Station : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
-                    titleList.put(marker,"Gas Station : " + feature.getProperties().getName());
                     break;
                 case "Restaurant":
                     marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(latitude, longitude))
                             .title("Restaurant : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
+                            .icon(bitmapDescriptorFromVector(context, R.drawable.ic_baseline_restaurant))
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
-
                     place.setName("Restaurant : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
@@ -713,15 +775,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_museum_black_24dp))
 
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
                     place.setName("Museum : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
@@ -731,15 +790,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .title("Park : " + feature.getProperties().getName())
                             .icon(bitmapDescriptorFromVector(context, R.drawable.baseline_park_black_24dp))
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
-                    markers.put(marker, dataModel);
                     place.setName("Park : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
@@ -749,53 +805,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             .title("SuperMarket : " + feature.getProperties().getName())
                             .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
                     );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    dataModel.put("address", feature.getProperties().getAddress_line2());
-                    dataModel.put("placeType",mode);
                     place.setName("SuperMarket : " + feature.getProperties().getName());
                     place.setAddress(feature.getProperties().getAddress_line2());
                     place.setPlaceType(mode);
-                    placesModelsList.add(place);
-                    markers.put(marker, dataModel);
-                    listener.put(marker,"PlaceMarkerType");
-                    break;
-                /*
-                default:
-                    marker = mGoogleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latitude, longitude))
-                            .title("SuperMarket : " + feature.getProperties().getName())
-                            .icon(bitmapDescriptorFromVector(context, R.drawable.supermarket_icon_32px))
-                    );
-                    dataModel.put("title", feature.getProperties().getName());
-                    dataModel.put("latitude", latitude);
-                    dataModel.put("longitude", longitude);
-                    markers.put(marker, dataModel);
-                    place.setName("SuperMarket : " + feature.getProperties().getName());
-                    place.setAddress(feature.getProperties().getAddress_line2());
+                    place.setLatitude(latitude);
+                    place.setLongitude(longitude);
+                    markers.put(marker, place);
                     placesModelsList.add(place);
                     listener.put(marker,"PlaceMarkerType");
                     break;
-
-                 */
 
             }
         }
     }
 
 
+    //Consume GSON of the routes for the directions data
     protected void consumeGson(String directionsJSON) {
         if (directionsJSON != null) {
 
             Gson gson = new Gson();
-            Root weatherData = gson.fromJson(directionsJSON, Root.class);
-            routes = weatherData.getRoutes();
+            Root routesData = gson.fromJson(directionsJSON, Root.class);
+            routes = routesData.getRoutes();
         }else{
 
         }
     }
 
+    //A class that parses the routes data to draw routes between two points.
+    //https://www.digitalocean.com/community/tutorials/android-google-map-drawing-route-two-points
     private class ParserTask extends AsyncTask<Void, Integer,List<Routes>> {
 
         // Parsing the data in non-ui thread
@@ -826,12 +864,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //dialogFragment.setUpFragmentUi(leg.getDistance().getText(),leg.getDuration().getText());
             Marker endMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getEnd_location().getLat(), leg.getEnd_location().getLng()))
-                    .title("End Location" + " " + leg.getEnd_address()));
+                    .title("End Location"));
 
             listener.put(endMarker,"directionMarker");
             Marker startMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(leg.getStart_location().getLat(), leg.getStart_location().getLng()))
-                    .title("Start Location " + leg.getStart_address())
+                    .title("Start Location ")
             );
             listener.put(startMarker,"directionMarker");
 
@@ -863,32 +901,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             options.addAll(stepList);
 
-
-            /*
-            for (Routes route: routes) {
-
-                for (Legs leg : route.getLegs()) {
-
-                    double lat = leg.getEnd_location().getLat();
-                    double lng = leg.getEnd_location().getLng();
-
-                    double lat2 = leg.getStart_location().getLat();
-                    double lng2 = leg.getEnd_location().getLng();
-                    LatLng position = new LatLng(lat, lng);
-                    LatLng position2 = new LatLng(lat2, lng2);
-                    points.add(position);
-                    points.add(position2);
-                }
-
-                lineOptions.addAll(points);
-                lineOptions.width(12);
-                lineOptions.color(Color.BLUE);
-                lineOptions.geodesic(true);
-
-            }
-
-             */
-
 // Drawing polyline in the Google Map for the i-th route
             Polyline polyline = mGoogleMap.addPolyline(options);
         }
@@ -912,7 +924,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMapView.onStop();
     }
 
-    private void clearUI() {
+    public void clearUI() {
 
         mGoogleMap.clear();
         getPlacesUrl();
