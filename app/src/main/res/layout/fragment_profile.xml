@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".profileFragment">
+    tools:context=".profileFragments.profileFragment">
 
 
     <FrameLayout
@@ -67,13 +67,6 @@
             android:text="  janedoe@fakeemail.com"
             android:textSize="20dp" />
 
-        <ImageButton
-            android:id="@+id/imageButtonBackProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#FFFFFF"
-            android:src="@drawable/ic_back" />
-
     </FrameLayout>
 
     <FrameLayout
@@ -83,8 +76,19 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="220dp"
-        android:layout_marginBottom="280dp">
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="264dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="237dp">
+
+        <TextView
+            android:id="@+id/points2Txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="175dp"
+            android:layout_marginTop="70dp"
+            android:text="Points"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/pointsTxt"
@@ -98,15 +102,6 @@
             android:textSize="30dp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/points2Txt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="175dp"
-            android:layout_marginTop="60dp"
-            android:text="Points"
-            android:textSize="20dp" />
-
     </FrameLayout>
 
     <RelativeLayout
@@ -117,25 +112,21 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="323dp"
-        android:layout_marginEnd="121dp"
-        android:layout_marginBottom="114dp">
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="371dp"
+        android:layout_marginEnd="75dp"
+        android:layout_marginBottom="66dp">
 
         <!--TODO: Create method going to favourites page-->
         <TextView
             android:id="@+id/favouritesTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="109dp"
-            android:layout_marginBottom="131dp"
+            android:layout_marginBottom="125dp"
             android:drawableLeft="@drawable/ic_baseline_favorite_border_24"
             android:onClick="replaceWithFavourites"
             android:text="  My Favourites"
@@ -145,36 +136,36 @@
             android:id="@+id/shareTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
+
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="45dp"
+            android:layout_marginTop="60dp"
             android:layout_marginEnd="67dp"
-            android:layout_marginBottom="94dp"
+            android:layout_marginBottom="80dp"
             android:drawableLeft="@drawable/ic_baseline_share_24"
             android:text="  Share with a friend"
             android:textSize="20dp" />
 
         <TextView
             android:id="@+id/settingsTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="20dp"
+            android:layout_width="184dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="28dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="80dp"
-            android:layout_marginEnd="161dp"
-            android:layout_marginBottom="59dp"
+            android:layout_marginTop="110dp"
+            android:layout_marginEnd="76dp"
+            android:layout_marginBottom="67dp"
             android:drawableLeft="@drawable/ic_settings"
-            android:text="  Settings"
+            android:text=" Settings"
             android:textSize="20dp" />
 
     </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/imageButtonBackProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FFFFFF"
+        android:src="@drawable/ic_back" />
 
 </RelativeLayout>

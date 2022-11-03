@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.company.opsc_south_side_application.loginRegsiterFragments.LoginFragment;
+
 public class LoginRegistrationActivity extends AppCompatActivity {
 
     @Override

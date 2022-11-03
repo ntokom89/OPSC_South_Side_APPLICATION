@@ -3,7 +3,7 @@ package com.company.opsc_south_side_application;
 import static android.content.ContentValues.TAG;
 
 import static com.company.opsc_south_side_application.BuildConfig.GOOGLE_KEY;
-import static com.company.opsc_south_side_application.NavigationFragment.isFavouritePlace;
+import static com.company.opsc_south_side_application.navigationFragments.NavigationFragment.isFavouritePlace;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,11 +37,17 @@ import com.company.opsc_south_side_application.directionsModel.Legs;
 import com.company.opsc_south_side_application.directionsModel.Root;
 import com.company.opsc_south_side_application.directionsModel.Routes;
 import com.company.opsc_south_side_application.directionsModel.step.Steps;
+import com.company.opsc_south_side_application.models.PlacesModel;
+import com.company.opsc_south_side_application.models.User;
+import com.company.opsc_south_side_application.navigationFragments.NavigationFragment;
+import com.company.opsc_south_side_application.navigationFragments.WhereNavigationFragment;
 import com.company.opsc_south_side_application.placesModel.Features;
+import com.company.opsc_south_side_application.profileFragments.profileFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -60,9 +66,7 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -73,14 +77,11 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static ArrayList<PlacesModel> placesModelsList = new ArrayList<>();
     public static ArrayList<PlacesModel> favouritePlacesModelsList = new ArrayList<>();
     public static NavigationFragment dialogFragment = new NavigationFragment();
-    public  WhereNavigationFragment whereNavFragment;
+    public WhereNavigationFragment whereNavFragment;
     public static FragmentContainerView containerView;
     public static String title;
 
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         firebaseUser = firebaseAuth.getUid();
          //firebaseUser = "Vcz171LR1EfrkfpNBkxz6wzp6fF3";
-        databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser);
 
 
 
@@ -382,6 +383,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             double lon = location.getLongitude();
                             Log.d("LocationM","lat : " + lat + " lon : " + lon);
                             origin = new LatLng(lat,lon);
+                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
+                            mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(12));
                             loadFirebaseData();
                             //loadFirebaseData();
                             //getPlacesUrl();

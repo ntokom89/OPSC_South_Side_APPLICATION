@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".LoginFragment">
+    tools:context=".loginRegsiterFragments.LoginFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -17,10 +17,23 @@
         android:textSize="34sp"
         android:textStyle="bold" />
 
+
+    <TextView
+        android:id="@+id/textViewGoogleAccountLink"
+        android:layout_width="350dp"
+        android:layout_height="55dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/rectangle"
+        android:drawableStart="@drawable/google_g"
+        android:gravity="center"
+        android:text="Sign in with Google"
+        android:textSize="18sp" />
+
     <EditText
         android:id="@+id/editTextLoginEmail"
         android:layout_width="350dp"
-        android:layout_height="60dp"
+        android:layout_height="55dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/shape_register_login"
@@ -33,7 +46,7 @@
     <EditText
         android:id="@+id/editTextLoginPassword"
         android:layout_width="350dp"
-        android:layout_height="60dp"
+        android:layout_height="55dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/shape_register_login"
