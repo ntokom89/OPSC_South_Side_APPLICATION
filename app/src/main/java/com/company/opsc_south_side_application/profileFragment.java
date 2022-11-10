@@ -1,18 +1,15 @@
 package com.company.opsc_south_side_application;
 
-import static com.company.opsc_south_side_application.MainActivity.buttonWhere;
-import static com.company.opsc_south_side_application.MainActivity.profileButton;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,8 +31,8 @@ public class profileFragment extends Fragment  {
     //DatabaseReference database = FirebaseDatabase.getInstance().getReference().child(user.getUid());
     DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Vcz171LR1EfrkfpNBkxz6wzp6fF3");
     TextView phone, email, about, name;
-    TextView settings;
-    ImageButton backButton;
+    TextView settings, favourites;
+    MaterialToolbar backToMap;
 
     //TODO: Start designing profile page
     // TODO: Rename parameter arguments, choose names that match
@@ -92,8 +89,8 @@ public class profileFragment extends Fragment  {
         about = view.findViewById(R.id.aboutTxt);
         name = view.findViewById(R.id.profileNameTxt);
         settings = view.findViewById(R.id.settingsTxt);
-        backButton = view.findViewById(R.id.imageButtonBackProfile);
-        //replaceWithSettings(view);
+        favourites = view.findViewById(R.id.favouritesTxt);
+        backToMap = view.findViewById(R.id.profileToolbar);
 
         database.addValueEventListener(new ValueEventListener() {
             @Override
@@ -127,12 +124,23 @@ public class profileFragment extends Fragment  {
                         .replace(R.id.fragmentContainerViewWhere, fragment1).setReorderingAllowed(true).commit();
             }
         });
-        backButton.setOnClickListener(new View.OnClickListener() {
+        favourites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getParentFragmentManager().beginTransaction().remove(profileFragment.this).commit();
-                buttonWhere.setVisibility(View.VISIBLE);
-                profileButton.setVisibility(View.VISIBLE);
+                Fragment fragment2 = new favouritesFragment();
+                //Developers, 2021)
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment2).setReorderingAllowed(true).commit();
+            }
+        });
+        //TODO: Make this go to the map activity/fragment
+        backToMap.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment3 = new profileFragment();
+                //Developers, 2021)
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment3).commit();
             }
         });
 

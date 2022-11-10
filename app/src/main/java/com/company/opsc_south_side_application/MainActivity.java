@@ -1,19 +1,9 @@
 package com.company.opsc_south_side_application;
 
 import static android.content.ContentValues.TAG;
-
-<<<<<<< HEAD
-=======
 import static com.company.opsc_south_side_application.BuildConfig.GOOGLE_KEY;
 import static com.company.opsc_south_side_application.NavigationFragment.isFavouritePlace;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentContainerView;
-
->>>>>>> cba977fb52aadb3d5aa6be3a444620950e9c067d
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -40,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentContainerView;
 
 import com.company.opsc_south_side_application.directionsModel.Legs;
 import com.company.opsc_south_side_application.directionsModel.Root;
@@ -81,14 +72,11 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -127,12 +115,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-<<<<<<< HEAD
+
         //setContentView(R.layout.activity_main);
-        setContentView(R.layout.fragment_edit_profile);
+        setContentView(R.layout.fragment_favourites);
 
         //Places.initialize(getApplicationContext(), GOOGLE_KEY);
-=======
+
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
         //dialogFragment = new NavigationFragment();
@@ -147,20 +135,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         firebaseUser = firebaseAuth.getUid();
          firebaseUser = "Vcz171LR1EfrkfpNBkxz6wzp6fF3";
         databaseReference = FirebaseDatabase.getInstance().getReference().child(firebaseUser);
-
-
-
-
-
->>>>>>> cba977fb52aadb3d5aa6be3a444620950e9c067d
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
         //button = findViewById(R.id.floatingActionButtonProfile);
         buttonWhere = findViewById(R.id.buttonWhereNavigation);
         containerView = findViewById(R.id.fragmentContainerViewNav);
         profileButton = findViewById(R.id.floatingActionButtonProfile);
-
-
 
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -251,12 +231,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //databaseReference.setValue(email);
                 databaseReference.child(user.getUserID()).setValue(user);
                 //databaseReference.child("password").setValue(password);
-                Toast.makeText(getContext().getApplicationContext(),"User details added to database ",Toast.LENGTH_LONG).show();
+                Toast.makeText(context.getApplicationContext(),"User details added to database ",Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext().getApplicationContext(),"Database error",Toast.LENGTH_LONG).show();
+                Toast.makeText(context.getApplicationContext(),"Database error",Toast.LENGTH_LONG).show();
             }
         });
 

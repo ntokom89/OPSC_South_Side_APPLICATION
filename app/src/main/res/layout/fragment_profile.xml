@@ -8,14 +8,37 @@
     android:background="#FFFFFF"
     tools:context=".profileFragment">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/profileToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:background="@null"
+        android:minHeight="?attr/actionBarSize"
+        app:navigationIcon="@drawable/ic_back">
+
+        <TextView
+            android:id="@+id/profilePageName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:textSize="20dp"/>
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="232dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="49dp"
-        android:layout_marginBottom="386dp">
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="418dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profilePicture"
@@ -66,25 +89,21 @@
             android:onClick="replaceWithEdit"
             android:text="  janedoe@fakeemail.com"
             android:textSize="20dp" />
-
-        <ImageButton
-            android:id="@+id/imageButtonBackProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#FFFFFF"
-            android:src="@drawable/ic_back" />
-
     </FrameLayout>
 
     <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="103dp"
+        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="220dp"
-        android:layout_marginBottom="280dp">
+        android:layout_marginStart="1dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="244dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginBottom="313dp">
 
         <TextView
             android:id="@+id/pointsTxt"
@@ -118,25 +137,26 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="2dp"
-        android:layout_marginTop="323dp"
+        android:layout_marginTop="342dp"
         android:layout_marginEnd="121dp"
-        android:layout_marginBottom="114dp">
+        android:layout_marginBottom="96dp">
 
         <!--TODO: Create method going to favourites page-->
+
         <TextView
             android:id="@+id/favouritesTxt"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="109dp"
-            android:layout_marginBottom="131dp"
-            android:drawableLeft="@drawable/ic_baseline_favorite_border_24"
+            android:layout_marginBottom="178dp"
+            android:drawableStart="@drawable/ic_favourite_empty"
             android:onClick="replaceWithFavourites"
             android:text="  My Favourites"
             android:textSize="20dp" />
@@ -144,7 +164,7 @@
         <TextView
             android:id="@+id/shareTxt"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="31dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
@@ -153,15 +173,15 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="45dp"
             android:layout_marginEnd="67dp"
-            android:layout_marginBottom="94dp"
+            android:layout_marginBottom="146dp"
             android:drawableLeft="@drawable/ic_baseline_share_24"
-            android:text="  Share with a friend"
+            android:text=" Share with a friend"
             android:textSize="20dp" />
 
         <TextView
             android:id="@+id/settingsTxt"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
@@ -169,8 +189,8 @@
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="80dp"
-            android:layout_marginEnd="161dp"
-            android:layout_marginBottom="59dp"
+            android:layout_marginEnd="114dp"
+            android:layout_marginBottom="112dp"
             android:drawableLeft="@drawable/ic_settings"
             android:text="  Settings"
             android:textSize="20dp" />

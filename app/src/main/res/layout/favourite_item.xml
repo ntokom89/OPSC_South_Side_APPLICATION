@@ -1,0 +1,57 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/favorite_item"
+    android:layout_width="match_parent"
+    android:layout_height="88dp"
+    android:orientation="horizontal">
+
+    <!-- TODO: When list of places is shown, find the type of establishment from dba and set image on right-->
+    <!-- <ImageView
+        android:id="@+id/favourite_image"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="10dp"
+        android:src="@drawable/common_google_signin_btn_icon_dark" />
+        -->
+
+    <LinearLayout
+        android:id="@+id/placeLayout"
+        android:layout_width="282dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/favourite_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Name"
+            android:textSize="23sp" />
+
+        <TextView
+            android:id="@+id/favourite_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="1234 Main St"
+            android:textColor="@color/quantum_grey500"
+            android:textSize="20sp"
+
+            />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/favourite_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="10dp"
+        android:layout_marginRight="2dp"
+        android:padding="10dp"
+        android:src="@drawable/ic_baseline_museum"
+
+        />
+</LinearLayout>
