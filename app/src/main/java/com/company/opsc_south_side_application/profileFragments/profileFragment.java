@@ -3,6 +3,7 @@ package com.company.opsc_south_side_application.profileFragments;
 import static com.company.opsc_south_side_application.MainActivity.buttonWhere;
 import static com.company.opsc_south_side_application.MainActivity.profileButton;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,8 +36,8 @@ public class profileFragment extends Fragment  {
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     //DatabaseReference database = FirebaseDatabase.getInstance().getReference().child(user.getUid());
     DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
-    TextView phone, email, about, name;
-    TextView settings;
+    TextView phone, email, about, name, points;
+    TextView settings, share, favourite;
     ImageButton backButton;
 
     //TODO: Start designing profile page
@@ -94,7 +95,10 @@ public class profileFragment extends Fragment  {
         about = view.findViewById(R.id.aboutTxt);
         name = view.findViewById(R.id.profileNameTxt);
         settings = view.findViewById(R.id.settingsTxt);
+        points = view.findViewById(R.id.pointsTxt);
+        share = view.findViewById(R.id.shareTxt);
         backButton = view.findViewById(R.id.imageButtonBackProfile);
+        favourite = view.findViewById(R.id.favouritesTxt);
         //replaceWithSettings(view);
 
         database.addValueEventListener(new ValueEventListener() {
@@ -112,6 +116,8 @@ public class profileFragment extends Fragment  {
 
                 //about = (TextView) snapshot.child("about").getValue();
                 about.setText(user.getAbout());
+
+                points.setText(user.getPoints() + "");
             }
 
             @Override
@@ -135,6 +141,29 @@ public class profileFragment extends Fragment  {
                 getParentFragmentManager().beginTransaction().remove(profileFragment.this).commit();
                 buttonWhere.setVisibility(View.VISIBLE);
                 profileButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        favourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment1 = new FavouriteListFragment();
+                //Developers, 2021)
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment1).setReorderingAllowed(true).commit();
+            }
+        });
+
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(Intent.ACTION_SEND);
+                myIntent.setType("text/plain");
+                String shareBody = "Your body is here";
+                String shareSub = "Your subject";
+                myIntent.putExtra(Intent.EXTRA_SUBJECT, shareBody);
+                myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(myIntent, "Share using"));
             }
         });
 

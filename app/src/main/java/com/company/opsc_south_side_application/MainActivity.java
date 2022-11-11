@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public WhereNavigationFragment whereNavFragment;
     public static FragmentContainerView containerView;
     public static String title;
+    Integer points;
 
     AutocompleteSupportFragment autocompleteFragment;
     @Override
@@ -193,7 +194,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 user = snapshot.getValue(User.class);
                 metric = user.getDistanceUnit();
                 landmarkPreference = user.getLandmarkPreference();
+                points = user.getPoints();
                 getPlacesUrl();
+                getPointsURL();
                 Log.d("Firebase data details", "metric : " + metric +", landmarkpreference : " + landmarkPreference);
                 placesListFirebase.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -589,6 +592,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return url;
     }
 
+    //Method to get list of places from Geoapify service place API
+    //https://www.geoapify.com/places-api
+    private String downloadPlacesUrlPoints(){
+        String url;
+        url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket,entertainment.museum,leisure.park,service.vehicle.fuel,catering.restaurant&filter=circle:" + origin.longitude + "," + origin.latitude +",50&bias=proximity:" + origin.longitude + "," + origin.latitude +"&limit=50&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+
+
+        return url;
+    }
     //method to get the places URL
     private  void getPlacesUrl(){
         Gson gson = new Gson();
@@ -607,6 +619,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private void getPointsURL(){
+        try {
+            String url = "";
+            url = downloadPlacesUrlPoints();
+            //url = "https://api.geoapify.com/v2/places?categories=commercial.supermarket&filter=circle:" + origin.longitude + "," + origin.latitude +",5000&bias=proximity:28.1289133,-25.9949025&limit=30&&apiKey=9c7ca58b70be4b988353ab35df122e0b";
+            URL url1 = new URL(url);
+            new fetchPlacesPointsData().execute(url1);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //A async Task method to fetch places data and consume it via GSON
     //https://www.digitalocean.com/community/tutorials/android-google-map-drawing-route-two-points
     public class fetchPlacesData extends AsyncTask<URL, Void, String> {
@@ -615,14 +640,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         protected String doInBackground(URL... urls) {
             URL url = urls[0];
             String data = null;
-            try{
+            try {
                 data = getResponseFromHttpUrl(url);
 
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return data;
         }
+
         @Override
         protected void onPostExecute(String propertiesData) {
             if (propertiesData != null) {
@@ -630,6 +656,68 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 consumeGsonPlaces(propertiesData);
             }
             super.onPostExecute(propertiesData);
+        }
+    }
+
+
+        public class fetchPlacesPointsData extends AsyncTask<URL, Void, String> {
+
+            @Override
+            protected String doInBackground(URL... urls) {
+                URL url = urls[0];
+                String data = null;
+                try{
+                    data = getResponseFromHttpUrl(url);
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                return data;
+            }
+            @Override
+            protected void onPostExecute(String propertiesData) {
+                if (propertiesData != null) {
+                    //TextView.setText(data);
+                    consumeGsonPlacesPoints(propertiesData);
+                }else {
+                    //Toast.makeText(getApplicationContext(), "",)
+                }
+                super.onPostExecute(propertiesData);
+            }
+        }
+    private void consumeGsonPlacesPoints(String propertiesData) {
+        Gson gson = new Gson();
+        Marker marker;
+        com.company.opsc_south_side_application.placesModel.Root placesData = gson.fromJson(propertiesData, com.company.opsc_south_side_application.placesModel.Root.class);
+        placesModelsList.clear();
+        for (Features feature : placesData.getFeatures()) {
+            double latitude = feature.getProperties().getLat();
+            double longitude = feature.getProperties().getLon();
+
+            String mode = " ";
+            List<String> modes = feature.getProperties().getCategories();
+
+            if (modes.contains("service.vehicle.fuel")) {
+                mode = "Gas Station";
+                Toast.makeText(getApplicationContext(),"5 points rewarded", Toast.LENGTH_SHORT).show();
+                points = points +5;
+            } else if (modes.contains("commercial.supermarket")) {
+                mode = "Supermarket";
+                Toast.makeText(getApplicationContext(),"10 points rewarded", Toast.LENGTH_SHORT).show();
+                points = points +10;
+            } else if (modes.contains("entertainment.museum")) {
+                mode = "Museum";
+                Toast.makeText(getApplicationContext(),"25 points rewarded", Toast.LENGTH_SHORT).show();
+                points = points +25;
+            } else if (modes.contains("leisure.park")) {
+                mode = "Park";
+                Toast.makeText(getApplicationContext(),"20 points rewarded", Toast.LENGTH_SHORT).show();
+                points = points +20;
+            } else if (modes.contains("catering.restaurant")) {
+                mode = "Restaurant";
+                Toast.makeText(getApplicationContext(),"15 points rewarded", Toast.LENGTH_SHORT).show();
+                points = points +15;
+            }
         }
     }
 

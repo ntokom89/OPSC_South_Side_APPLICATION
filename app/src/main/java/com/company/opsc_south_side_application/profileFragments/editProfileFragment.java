@@ -13,7 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.company.opsc_south_side_application.R;
+import com.company.opsc_south_side_application.models.User;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,7 +47,7 @@ public class editProfileFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    Toolbar back;
+    MaterialToolbar back;
     EditText name, about, homeAddress, phoneNum, email;
     Button save;
     View editProfile;
@@ -88,7 +90,6 @@ public class editProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_edit_profile, container, false);
-
         name = view.findViewById(R.id.nameEditTextEditProfile);
         about = view.findViewById(R.id.aboutEditTextEditProfile);
         homeAddress = view.findViewById(R.id.addressEditTextEditProfile);
@@ -106,14 +107,28 @@ public class editProfileFragment extends Fragment {
             public void onClick(View view) {
                 //Starting Settings fragment
                 Fragment fragment1 = new settingsFragment();
-                int transaction = getChildFragmentManager().beginTransaction()
-                        .replace(R.id.editProfileView, fragment1).commit();
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainerViewWhere, fragment1).commit();
             }
         });
 
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                name.setText(user.getName());
+                about.setText(user.getAbout());
+                homeAddress.setText(user.getAddress());
+                phoneNum.setText(user.getPhoneNumber());
+                email.setText(user.getEmail());
+
+                userName = user.getName();
+                userAbout = user.getAbout();
+                userAddress = user.getAddress();
+                userPhone = user.getPhoneNumber();
+                userEmail = user.getEmail();
+
+                /*
                 userName = (String) snapshot.child("name").getValue();
                 name.setText(userName);
 
@@ -128,6 +143,8 @@ public class editProfileFragment extends Fragment {
 
                 userEmail = (String) snapshot.child("email").getValue();
                 email.setText(userEmail);
+
+                 */
             }
 
             @Override
@@ -136,18 +153,22 @@ public class editProfileFragment extends Fragment {
             }
         });
 
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(nameChanged() || aboutChanged() || addressChanged() || numberChanged() || emailChanged()) {
+                    Toast.makeText(getContext().getApplicationContext(), "Details updated", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getContext().getApplicationContext(), "Not Updated", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
         // Inflate the layout for this fragment
         return view;
     }
     //This runs when the Save button is clicked (see on click listener for button in layout)
-    public void update(View view){
-        if(nameChanged() || aboutChanged() || addressChanged() || numberChanged() || emailChanged()) {
-            Toast.makeText(getContext().getApplicationContext(), "Details updated", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getContext().getApplicationContext(), "Not Updated", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     //(see Update Data Firebase Android Studio Edit Profile Android Studio Firebase Firebase realtime database, 2020)
     //Logic for the email changed is the same for all the fields changed methods after
@@ -159,7 +180,7 @@ public class editProfileFragment extends Fragment {
 
             emailHash.put("email", email.getText().toString());
             //... set the value in the email field to the email entered in the edit text
-            database.child(userEmail).updateChildren(emailHash).addOnSuccessListener(new OnSuccessListener() {
+            database.updateChildren(emailHash).addOnSuccessListener(new OnSuccessListener() {
                 @Override
                 public void onSuccess(Object o) {
                     Toast.makeText(getContext().getApplicationContext(), "Email updated",Toast.LENGTH_SHORT).show();
@@ -174,7 +195,18 @@ public class editProfileFragment extends Fragment {
 
     private boolean numberChanged() {
         if(!userPhone.equals(phoneNum.getText().toString())){
-            database.child(userPhone).child("phoneNumber").setValue(phoneNum.getText().toString());
+            //database.child(userPhone).child("phoneNumber").setValue(phoneNum.getText().toString());
+
+            HashMap phoneHash = new HashMap();
+
+            phoneHash.put("phoneNumber", phoneNum.getText().toString());
+            //... set the value in the email field to the email entered in the edit text
+            database.updateChildren(phoneHash).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Toast.makeText(getContext().getApplicationContext(), "Phone Number updated",Toast.LENGTH_SHORT).show();
+                }
+            });
             return true;
         } else {
             return false;
@@ -183,7 +215,18 @@ public class editProfileFragment extends Fragment {
 
     private boolean addressChanged() {
         if(!userAddress.equals(homeAddress.getText().toString())){
-            database.child(userAddress).child("address").setValue(homeAddress.getText().toString());
+            //database.child(userPhone).child("phoneNumber").setValue(phoneNum.getText().toString());
+
+            HashMap addressHash = new HashMap();
+
+            addressHash.put("address", homeAddress.getText().toString());
+            //... set the value in the email field to the email entered in the edit text
+            database.updateChildren(addressHash).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Toast.makeText(getContext().getApplicationContext(), "Address updated",Toast.LENGTH_SHORT).show();
+                }
+            });
             return true;
         } else {
             return false;
@@ -193,7 +236,17 @@ public class editProfileFragment extends Fragment {
 
     private boolean aboutChanged() {
         if(!userAbout.equals(about.getText().toString())){
-            database.child(userAbout).child("about").setValue(about.getText().toString());
+
+            HashMap aboutHash = new HashMap();
+
+            aboutHash.put("about", about.getText().toString());
+            //... set the value in the email field to the email entered in the edit text
+            database.updateChildren(aboutHash).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Toast.makeText(getContext().getApplicationContext(), "About Details updated",Toast.LENGTH_SHORT).show();
+                }
+            });
             return true;
         } else {
             return false;
@@ -203,7 +256,16 @@ public class editProfileFragment extends Fragment {
     private boolean nameChanged() {
 
         if(!userName.equals(name.getText().toString())){
-            database.child(userName).child("name").setValue(name.getText().toString());
+            HashMap nameHash = new HashMap();
+
+            nameHash.put("name", name.getText().toString());
+            //... set the value in the email field to the email entered in the edit text
+            database.updateChildren(nameHash).addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Toast.makeText(getContext().getApplicationContext(), "Name updated",Toast.LENGTH_SHORT).show();
+                }
+            });
             return true;
         } else {
             return false;

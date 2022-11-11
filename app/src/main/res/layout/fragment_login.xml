@@ -20,7 +20,7 @@
 
     <TextView
         android:id="@+id/textViewGoogleAccountLink"
-        android:layout_width="350dp"
+        android:layout_width="300dp"
         android:layout_height="55dp"
         android:layout_gravity="center"
         android:layout_marginTop="15dp"
@@ -32,9 +32,9 @@
 
     <EditText
         android:id="@+id/editTextLoginEmail"
-        android:layout_width="350dp"
+        android:layout_width="300dp"
         android:layout_height="55dp"
-        android:layout_marginLeft="30dp"
+        android:layout_gravity="center"
         android:layout_marginTop="25dp"
         android:background="@drawable/shape_register_login"
         android:drawableLeft="@drawable/ic_baseline_alternate_email_24"
@@ -45,9 +45,9 @@
 
     <EditText
         android:id="@+id/editTextLoginPassword"
-        android:layout_width="350dp"
+        android:layout_width="300dp"
         android:layout_height="55dp"
-        android:layout_marginLeft="30dp"
+        android:layout_gravity="center"
         android:layout_marginTop="25dp"
         android:background="@drawable/shape_register_login"
         android:drawableLeft="@drawable/ic_baseline_lock"

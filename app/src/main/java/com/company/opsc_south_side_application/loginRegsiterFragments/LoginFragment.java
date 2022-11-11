@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -125,14 +126,15 @@ public class LoginFragment extends Fragment {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!(email.getText().equals("")) && !(password.getText().equals(""))){
+                if(!(TextUtils.isEmpty(email.getText())) && !(TextUtils.isEmpty(password.getText()))){
+                    Log.d("Passed through check","inputs not null");
                         signInWithAccount(email.getText().toString(), password.getText().toString());
 
                 }else{
-                    if((password.getText().equals(""))){
+                    if(TextUtils.isEmpty(password.getText())){
                         password.setError("Please enter your password");
                     }
-                    if((email.getText().equals(""))){
+                    if(TextUtils.isEmpty(email.getText())){
                         email.setError("Please enter your email");
                     }
 
@@ -268,6 +270,9 @@ public class LoginFragment extends Fragment {
                                         user.setPhoneNumber("");
                                         user.setDistanceUnit("metric");
                                         user.setLandmarkPreference("None");
+                                        user.setPoints(0);
+                                        user.setAbout("");
+                                        user.setAddress("");
                                         databaseReference.child(user.getUserID()).setValue(user);
                                         Intent i = new Intent(getContext().getApplicationContext(),MainActivity.class);
                                         startActivity(i);

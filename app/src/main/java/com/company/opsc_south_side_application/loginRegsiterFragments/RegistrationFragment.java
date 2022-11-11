@@ -131,6 +131,9 @@ public class RegistrationFragment extends Fragment {
         user.setPhoneNumber("");
         user.setDistanceUnit("metric");
         user.setLandmarkPreference("None");
+        user.setAddress("");
+        user.setAbout("");
+        user.setPoints(0);
         firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {

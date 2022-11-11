@@ -13,14 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"></com.google.android.gms.maps.MapView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButtonProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:scaleType="fitXY"
-        tools:srcCompat="@drawable/ic_baseline_person_24" />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerViewNav"
         android:layout_width="match_parent"
@@ -32,8 +24,11 @@
         android:id="@+id/fragmentContainerViewWhere"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
-        />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="-2dp"
+        android:visibility="visible" />
 
     <Button
         android:id="@+id/buttonWhereNavigation"
@@ -48,6 +43,15 @@
         app:icon="@drawable/ic_baseline_search"
         app:iconTint="#000000"
         tools:layout="@layout/places_autocomplete_fragment" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButtonProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_baseline_person_24"
+        tools:srcCompat="@drawable/ic_baseline_person_24" />
 
 
 </RelativeLayout>

@@ -256,7 +256,7 @@ public class settingsFragment extends Fragment {
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(getContext().getApplicationContext(), LoginRegistrationActivity.class);
         startActivity(intent);
-        //finish();
+        getActivity().finish();
 
     }
 
