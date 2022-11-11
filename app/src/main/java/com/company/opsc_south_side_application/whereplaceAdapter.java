@@ -35,6 +35,23 @@ public class whereplaceAdapter extends RecyclerView.Adapter<whereplaceAdapter.My
     @Override
     public void onBindViewHolder(@NonNull MyViewHoler holder, int position) {
         PlacesModel myImages = placeList.get(position);
+        switch(myImages.getPlaceType()){
+            case "Gas Station":
+                holder.categoryImage.setImageResource(R.drawable.baseline_local_gas_station_black_24dp);
+                break;
+            case "Restaurant":
+                holder.categoryImage.setImageResource(R.drawable.ic_baseline_restaurant);
+                break;
+            case "Museum":
+                holder.categoryImage.setImageResource(R.drawable.baseline_museum_black_24dp);
+                break;
+            case "Park":
+                holder.categoryImage.setImageResource(R.drawable.baseline_park_black_24dp);
+                break;
+            case "Supermarket":
+                holder.categoryImage.setImageResource(R.drawable.ic_baseline_supermarket);
+                break;
+        }
         holder.placeName.setText(myImages.getName());
         holder.placeAddress.setText(myImages.getAddress());
     }

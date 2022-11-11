@@ -14,12 +14,12 @@
         android:layout_height="match_parent"></com.google.android.gms.maps.MapView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/floatingActionButtonProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:scaleType="fitXY"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@drawable/ic_baseline_person_24" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerViewNav"
@@ -28,6 +28,13 @@
         android:layout_marginTop="300dp"
         android:visibility="visible" />
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerViewWhere"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        />
+
     <Button
         android:id="@+id/buttonWhereNavigation"
         android:layout_width="match_parent"
@@ -35,7 +42,7 @@
         android:layout_marginTop="530dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/circle_shape_btn"
-        android:backgroundTint="#FFFFFF"
+        android:backgroundTint="@null"
         android:text="Where to?"
         android:textColor="#000000"
         app:icon="@drawable/ic_baseline_search"

@@ -6,9 +6,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".WhereNavigationFragment">
+
     <ScrollView
-        android:layout_width="413dp"
-        android:layout_height="666dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -17,9 +18,20 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="608dp"
+                android:layout_height="750dp"
+                android:background="#ECE4E4"
                 app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
                 app:layout_constraintTop_toTopOf="@+id/linearLayout3">
+
+                <TextView
+                    android:id="@+id/textViewFavouritePlaces"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Favourite Places"
+                    android:textColor="#000000"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
                 <Button
                     android:id="@+id/buttonNavStart"
@@ -48,25 +60,23 @@
                     android:id="@+id/imageButtonBackMap"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="13dp"
-                    android:backgroundTint="#FFFFFF"
-                    app:layout_constraintEnd_toStartOf="@+id/autoCompleteOriginWhere"
-                    app:layout_constraintStart_toStartOf="@+id/autoCompleteOriginWhere"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#ECE4E4"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_back" />
 
-                <ScrollView
+                <androidx.core.widget.NestedScrollView
                     android:id="@+id/scrollView2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginStart="3dp"
                     android:layout_marginTop="52dp"
-                    android:layout_marginEnd="13dp"
                     android:layout_marginBottom="34dp"
                     app:layout_constraintBottom_toTopOf="@+id/scrollView3"
-                    app:layout_constraintEnd_toEndOf="@+id/linearLayout3"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/linearLayout3">
+                    app:layout_constraintTop_toTopOf="@+id/linearLayout3"
+                    app:layout_constraintVertical_bias="1.0">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -75,21 +85,22 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/recyclerViewNearbyPlaces"
-                            android:layout_width="360dp"
+                            android:layout_width="match_parent"
                             android:layout_height="153dp" />
+
                     </LinearLayout>
-                </ScrollView>
+                </androidx.core.widget.NestedScrollView>
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/autoCompleteOriginWhere"
                     android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-                    android:layout_width="0dp"
-                    android:layout_height="51dp"
+                    android:layout_width="305dp"
+                    android:layout_height="57dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="72dp"
-                    android:layout_marginEnd="60dp"
+                    android:layout_marginTop="84dp"
+                    android:layout_marginEnd="30dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintHorizontal_bias="0.767"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:layout="@layout/places_autocomplete_fragment" />
@@ -100,9 +111,7 @@
                     android:layout_height="44dp"
                     android:layout_marginStart="34dp"
                     android:layout_marginTop="50dp"
-                    android:layout_marginEnd="34dp"
                     android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/buttonNavStart">
 
@@ -114,7 +123,7 @@
 
                         android:layout_marginEnd="2dp"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:backgroundTint="#ECE4E4"
                         android:src="@drawable/baseline_local_gas_station_black_24dp"
                         app:layout_constraintEnd_toStartOf="@+id/imageButtonTrainMode"
                         app:layout_constraintStart_toStartOf="parent"
@@ -126,7 +135,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="18dp"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:backgroundTint="#ECE4E4"
                         android:src="@drawable/ic_baseline_shopping_cart"
                         app:layout_constraintEnd_toStartOf="@+id/imageButtonTaxiMode"
                         app:layout_constraintStart_toEndOf="@+id/imageButtonCarMode"
@@ -138,7 +147,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="2dp"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:backgroundTint="#ECE4E4"
                         android:src="@drawable/ic_baseline_restaurant"
                         app:layout_constraintEnd_toStartOf="@+id/imageButtonWalkMode"
                         app:layout_constraintStart_toEndOf="@+id/imageButtonTrainMode"
@@ -150,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:backgroundTint="#ECE4E4"
                         android:src="@drawable/baseline_park_black_24dp"
                         app:layout_constraintEnd_toStartOf="@+id/imageButtonCycleMode"
                         app:layout_constraintStart_toEndOf="@+id/imageButtonTaxiMode"
@@ -161,7 +170,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:backgroundTint="@color/white"
+                        android:backgroundTint="#ECE4E4"
                         android:src="@drawable/ic_baseline_museum"
                         app:layout_constraintBottom_toBottomOf="@+id/imageButtonTrainMode"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -172,12 +181,13 @@
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/autoCompleteDestinationWhere"
                     android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-                    android:layout_width="0dp"
-                    android:layout_height="51dp"
+                    android:layout_width="305dp"
+                    android:layout_height="57dp"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="135dp"
-                    android:layout_marginEnd="60dp"
+                    android:layout_marginTop="152dp"
+                    android:layout_marginEnd="30dp"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.767"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:layout="@layout/places_autocomplete_fragment" />
@@ -193,11 +203,11 @@
                     app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
                     app:layout_constraintStart_toStartOf="@+id/buttonNavStart" />
 
-                <ScrollView
+                <androidx.core.widget.NestedScrollView
                     android:id="@+id/scrollView3"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="546dp"
+                    android:layout_marginTop="580dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -208,11 +218,11 @@
                         android:orientation="vertical">
 
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/RecyclerViewFavourites"
-                            android:layout_width="360dp"
+                            android:id="@+id/recyclerViewFavourites"
+                            android:layout_width="match_parent"
                             android:layout_height="153dp" />
                     </LinearLayout>
-                </ScrollView>
+                </androidx.core.widget.NestedScrollView>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>

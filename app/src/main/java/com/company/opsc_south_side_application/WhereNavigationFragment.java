@@ -2,11 +2,15 @@ package com.company.opsc_south_side_application;
 
 import static android.content.ContentValues.TAG;
 
+import static com.company.opsc_south_side_application.MainActivity.buttonWhere;
 import static com.company.opsc_south_side_application.MainActivity.dest;
+import static com.company.opsc_south_side_application.MainActivity.favouritePlacesModelsList;
 import static com.company.opsc_south_side_application.MainActivity.fragmentType;
 import static com.company.opsc_south_side_application.MainActivity.getDirectionsUrl;
+import static com.company.opsc_south_side_application.MainActivity.metric;
 import static com.company.opsc_south_side_application.MainActivity.origin;
 import static com.company.opsc_south_side_application.MainActivity.placesModelsList;
+import static com.company.opsc_south_side_application.MainActivity.profileButton;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -14,6 +18,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -40,7 +45,7 @@ import java.util.Objects;
  * Use the {@link WhereNavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WhereNavigationFragment extends DialogFragment {
+public class WhereNavigationFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,12 +93,15 @@ public class WhereNavigationFragment extends DialogFragment {
         }
     }
 
+    //method to create all UI components in fragments
+    //https://stackoverflow.com/questions/41345987/how-to-use-placeautocompletefragment-widget-in-a-fragment Jordon
+    //https://stackoverflow.com/questions/21824542/android-scrollview-inside-another-scrollview-doesnt-scroll Volodymyr Kulyk
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_where_navigation, container, false);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_OPSC_South_Side_Application);
+        //setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_OPSC_South_Side_Application);
         AutocompleteSupportFragment autocompleteFragmentStart = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.autoCompleteOriginWhere);
         AutocompleteSupportFragment autocompleteFragmentDestination = (AutocompleteSupportFragment)
@@ -102,6 +110,7 @@ public class WhereNavigationFragment extends DialogFragment {
         buttonStartNav = view.findViewById(R.id.buttonNavStart);
         backButton = view.findViewById(R.id.imageButtonBackMap);
         recyclerViewPlaces = view.findViewById(R.id.recyclerViewNearbyPlaces);
+        RecyclerViewFavouritesPlaces = view.findViewById(R.id.recyclerViewFavourites);
 
         autocompleteFragmentStart.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG,Place.Field.ADDRESS));
 
@@ -113,11 +122,11 @@ public class WhereNavigationFragment extends DialogFragment {
                 URL urlConnection;
                 String url;
                 try {
-                    url = getDirectionsUrl(originWhere, destWhere, null);
+                    url = getDirectionsUrl(originWhere, destWhere, null,metric);
                     fragmentType = "Where Nav";
                     urlConnection = new URL(url);
                     MainActivity main = new MainActivity();
-                    main.impelemntFetchDirection(urlConnection);
+                    main.impelementFetchDirection(urlConnection);
                     //new MainActivity.fetchDirectionsData().execute(urlConnection);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -128,8 +137,11 @@ public class WhereNavigationFragment extends DialogFragment {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Dialog d = getDialog();
-                d.dismiss();
+                //Dialog d = getDialog();
+                //d.dismiss();
+                getParentFragmentManager().beginTransaction().remove(WhereNavigationFragment.this).commit();
+                buttonWhere.setVisibility(View.VISIBLE);
+                profileButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -162,9 +174,16 @@ public class WhereNavigationFragment extends DialogFragment {
             }
         });
 
+        recyclerViewPlaces.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
         whereplaceAdapter adapter = new whereplaceAdapter(placesModelsList);
 
         recyclerViewPlaces.setAdapter(adapter);
+
+
+        RecyclerViewFavouritesPlaces.setLayoutManager(new LinearLayoutManager(getContext().getApplicationContext()));
+        whereplaceAdapter adapterfav = new whereplaceAdapter(favouritePlacesModelsList);
+
+        RecyclerViewFavouritesPlaces.setAdapter(adapterfav);
         return view;
     }
 
@@ -172,13 +191,5 @@ public class WhereNavigationFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        Dialog d = getDialog();
-        if (d != null)
-        {
-            int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = ViewGroup.LayoutParams.MATCH_PARENT;
-            d.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
-
     }
 }

@@ -208,7 +208,7 @@
                         android:orientation="vertical">
 
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/RecyclerViewFavourites"
+                            android:id="@+id/recyclerViewFavourites"
                             android:layout_width="360dp"
                             android:layout_height="153dp" />
                     </LinearLayout>

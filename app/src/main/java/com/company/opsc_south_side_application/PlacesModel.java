@@ -36,12 +36,12 @@ public class PlacesModel {
         this.name = name;
     }
 
-    public String getLocation() {
+    public String getPlaceType() {
         return placeType;
     }
 
-    public void setLocation(String location) {
-        this.placeType = location;
+    public void setPlaceType(String placeType) {
+        this.placeType = placeType;
     }
 
     public String getAddress() {
